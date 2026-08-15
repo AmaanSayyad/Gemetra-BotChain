@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import App from "./App";
+import "./config/appkit";
 import { wagmiConfig } from "./config/wagmi";
 import "./index.css";
 

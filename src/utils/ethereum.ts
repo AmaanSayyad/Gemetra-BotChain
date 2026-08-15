@@ -1,7 +1,5 @@
 import {
   createPublicClient,
-  createWalletClient,
-  custom,
   http,
   parseUnits,
   formatUnits,
@@ -11,6 +9,7 @@ import {
   type Address,
   type Hex,
 } from "viem";
+import { getAccount, getWalletClient, switchChain } from "wagmi/actions";
 import {
   botChain,
   BOT_CHAIN_ID,
@@ -18,6 +17,7 @@ import {
   BOTCHAIN_USDT_ADDRESS,
   BOTCHAIN_USDT_DECIMALS,
 } from "../config/botchain";
+import { wagmiConfig } from "../config/wagmi";
 
 const GEMETRA_CORE_ABI = [
   {
@@ -74,48 +74,21 @@ const publicClient = createPublicClient({
   transport: http(BOT_CHAIN_RPC),
 });
 
-function getEthereumProvider(): { request: (...args: unknown[]) => Promise<unknown> } {
-  if (typeof window === "undefined" || !window.ethereum) {
-    throw new Error("No EVM wallet detected. Install MetaMask or BO Wallet.");
-  }
-  return window.ethereum as { request: (...args: unknown[]) => Promise<unknown> };
-}
-
-async function getWalletClient() {
-  const provider = getEthereumProvider();
-  return createWalletClient({
-    chain: botChain,
-    transport: custom(provider),
-  });
-}
-
 export async function ensureBotChain(): Promise<void> {
-  const provider = getEthereumProvider();
-  const hexId = `0x${BOT_CHAIN_ID.toString(16)}`;
+  const { chainId } = getAccount(wagmiConfig);
+  if (chainId === BOT_CHAIN_ID) return;
   try {
-    await provider.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: hexId }],
-    });
-  } catch (err) {
-    const code = (err as { code?: number })?.code;
-    if (code === 4902) {
-      await provider.request({
-        method: "wallet_addEthereumChain",
-        params: [
-          {
-            chainId: hexId,
-            chainName: "BOT Chain",
-            nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
-            rpcUrls: [BOT_CHAIN_RPC],
-            blockExplorerUrls: ["https://scan.botchain.ai"],
-          },
-        ],
-      });
-      return;
-    }
-    throw err;
+    await switchChain(wagmiConfig, { chainId: BOT_CHAIN_ID });
+  } catch {
+    throw new Error("Please switch to BOT Chain (chain ID 677) in your wallet.");
   }
+}
+
+async function connectedWallet() {
+  await ensureBotChain();
+  const wallet = await getWalletClient(wagmiConfig);
+  if (!wallet?.account) throw new Error("Wallet not connected");
+  return wallet;
 }
 
 export const isValidEthereumAddress = (address: string): boolean =>
@@ -128,20 +101,15 @@ export const formatAddress = (address: string): string =>
   address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
 
 export const getConnectedAccount = (): string | null => {
-  if (typeof window === "undefined") return null;
-  const eth = window.ethereum as { selectedAddress?: string } | undefined;
-  const selected = eth?.selectedAddress;
-  return selected && isAddress(selected) ? getAddress(selected) : null;
+  const address = getAccount(wagmiConfig).address;
+  return address && isAddress(address) ? getAddress(address) : null;
 };
 
 export const isWalletConnected = (): boolean => Boolean(getConnectedAccount());
 
 async function resolveSender(): Promise<Address> {
-  await ensureBotChain();
-  const wallet = await getWalletClient();
-  const [account] = await wallet.getAddresses();
-  if (!account) throw new Error("Wallet not connected");
-  return getAddress(account);
+  const wallet = await connectedWallet();
+  return getAddress(wallet.account.address);
 }
 
 export const getPusdMintAddress = async (): Promise<string> => BOTCHAIN_USDT_ADDRESS;
@@ -178,7 +146,7 @@ function toTokenAmount(amount: number, token: PaymentToken): bigint {
 const sendNativeTransfer = async (recipient: string, amount: number): Promise<Hex> => {
   if (!isAddress(recipient)) throw new Error("Invalid BOT Chain wallet address");
   const sender = await resolveSender();
-  const wallet = await getWalletClient();
+  const wallet = await connectedWallet();
   return wallet.sendTransaction({
     account: sender,
     to: getAddress(recipient),
@@ -190,7 +158,7 @@ const sendNativeTransfer = async (recipient: string, amount: number): Promise<He
 const sendUsdtTransfer = async (recipient: string, amount: number): Promise<Hex> => {
   if (!isAddress(recipient)) throw new Error("Invalid BOT Chain wallet address");
   const sender = await resolveSender();
-  const wallet = await getWalletClient();
+  const wallet = await connectedWallet();
   return wallet.writeContract({
     account: sender,
     address: BOTCHAIN_USDT_ADDRESS,
@@ -251,7 +219,7 @@ export const sendBulkPayments = async (
     const core = getGemetraCoreAddress();
     if (core && valid.length > 0) {
       const sender = await resolveSender();
-      const wallet = await getWalletClient();
+      const wallet = await connectedWallet();
       const tokenAddress = normalized === "BOT" ? ("0x0000000000000000000000000000000000000000" as Address) : BOTCHAIN_USDT_ADDRESS;
       const amounts = valid.map((item) => toTokenAmount(item.amount, normalized));
       const addrs = valid.map((item) => getAddress(item.address));
@@ -368,7 +336,7 @@ export async function recordVatRefundOnChain(opts: {
   if (!core || !isAddress(opts.recipient)) return null;
   try {
     const sender = await resolveSender();
-    const wallet = await getWalletClient();
+    const wallet = await connectedWallet();
     const normalized = normalizePaymentToken(opts.token);
     const tokenAddress =
       normalized === "BOT" ? ("0x0000000000000000000000000000000000000000" as Address) : BOTCHAIN_USDT_ADDRESS;
