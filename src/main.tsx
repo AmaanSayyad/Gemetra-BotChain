@@ -2,12 +2,11 @@ import "./polyfills";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WagmiProvider } from "wagmi";
 import App from "./App";
-import { SolanaProviders } from "./solana/SolanaProviders";
-import "@solana/wallet-adapter-react-ui/styles.css";
+import { wagmiConfig } from "./config/wagmi";
 import "./index.css";
 
-// Create QueryClient for TanStack Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,13 +15,12 @@ const queryClient = new QueryClient({
   },
 });
 
-// Render app with Query provider
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <SolanaProviders>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
         <App />
-      </SolanaProviders>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   </React.StrictMode>
 );

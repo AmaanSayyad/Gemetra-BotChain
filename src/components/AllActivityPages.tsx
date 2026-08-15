@@ -192,7 +192,7 @@ export const AllActivityPage: React.FC<AllActivityPageProps> = ({
                       {activity.transactionHash && (
                         <div className="mb-2">
                           <a
-                            href={`https://solscan.io/tx/${activity.transactionHash}`}
+                            href={`https://scan.botchain.ai/tx/${activity.transactionHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent triggering parent click

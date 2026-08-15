@@ -82,8 +82,8 @@ export const PayrollOverview: React.FC<PayrollOverviewProps> = ({ employees, set
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
           <img
-            src="/pusd.svg"
-            alt="PUSD logo"
+            src="/usdt.png"
+            alt="USDT logo"
             className="h-5 w-5 object-contain"
           />
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">Payroll Overview</h3>

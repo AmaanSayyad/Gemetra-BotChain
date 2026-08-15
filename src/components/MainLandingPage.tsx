@@ -41,17 +41,17 @@ function GemetraLandingPage() {
         <div className="z-10 flex w-full min-w-0 max-w-full flex-col items-center justify-center gap-5 sm:gap-7">
           <div className="mb-1 inline-flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-full bg-brand-50 px-3 py-2 sm:gap-3 sm:px-4 sm:py-2">
             <img
-              src="/solana-sol-logo.png"
-              alt="Solana logo"
+              src="/bot-token.svg"
+              alt="BOT Chain logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
             <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on SOLANA</span>
             <img
-              src="/pusd.svg"
-              alt="Palm USD logo"
+              src="/usdt.png"
+              alt="USDT logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
-            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Powered by PUSD</span>
+            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Powered by USDT</span>
           </div>
           <span className="w-full min-w-0 max-w-[1024px] px-1 text-center font-['Montserrat'] font-[900] leading-[1.08] tracking-tight text-brand-800 text-[clamp(1.75rem,calc(0.85rem+4.2vw),6rem)] sm:leading-[1.04]">
             {"Global Remittance"} <br />
@@ -62,7 +62,7 @@ function GemetraLandingPage() {
 
           <span className="w-full min-w-0 max-w-[40rem] px-1 text-center font-['Montserrat'] text-[15px] font-[600] leading-[1.45] text-brand-800 sm:text-[17px] sm:leading-[1.5] md:text-[20px] md:leading-[30px]">
             {
-              "Borderless payments infrastructure built on Solana with Palm USD (PUSD) unifying VAT refunds and global payroll automation. Trustless, transparent, and programmable money with AI-driven financial intelligence."
+              "Borderless payments infrastructure built on BOT Chain with USDT unifying VAT refunds and global payroll automation. Trustless, transparent, and programmable money with AI-driven financial intelligence."
             }
           </span>
         </div>
@@ -92,7 +92,7 @@ function GemetraLandingPage() {
         <div className="z-10 mt-8 flex w-full min-w-0 max-w-[1024px] flex-wrap justify-center gap-x-8 gap-y-6 sm:mt-12 sm:gap-x-12">
           <div className="flex min-w-[5.5rem] flex-col items-center">
             <span className="font-['Montserrat'] text-2xl font-[900] text-brand-800 sm:text-4xl">&lt;1s</span>
-            <span className="font-['Montserrat'] text-xs font-[600] text-brand-600 sm:text-[14px]">Solana Finality</span>
+            <span className="font-['Montserrat'] text-xs font-[600] text-brand-600 sm:text-[14px]">BOT Chain Finality</span>
           </div>
           <div className="flex min-w-[5.5rem] flex-col items-center">
             <span className="font-['Montserrat'] text-2xl font-[900] text-brand-800 sm:text-4xl">5</span>
@@ -145,30 +145,30 @@ function GemetraLandingPage() {
               <div className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center">
                 <img
                   className="h-8 object-cover"
-                  src="/solana-sol-logo.png"
-                  alt="Solana logo"
+                  src="/bot-token.svg"
+                  alt="BOT Chain logo"
                 />
               </div>
               <h3 className="font-['Montserrat'] text-[24px] font-[700]">Blockchain Layer</h3>
             </div>
             <p className="text-subtext-color font-['Montserrat'] text-[16px] leading-[24px]">
-              Built on Solana with Palm USD (PUSD) for programmable money, secure transactions, and transparent payroll automation.
+              Built on BOT Chain with USDT for programmable money, secure transactions, and transparent payroll automation.
             </p>
             <div className="flex flex-wrap gap-2 mt-auto">
-              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">Solana Network</span>
-              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">Palm USD (PUSD)</span>
+              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Network</span>
+              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">USDT</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">SPL Token Standard</span>
             </div>
             <div className="flex items-center gap-3 mt-4">
               <img
                 className="h-8 w-8 object-contain"
-                src="/solana-sol-logo.png"
-                alt="Solana logo"
+                src="/bot-token.svg"
+                alt="BOT Chain logo"
               />
               <img
                 className="h-8 w-8 object-contain"
-                src="/pusd.svg"
-                alt="Palm USD logo"
+                src="/usdt.png"
+                alt="USDT logo"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ function GemetraLandingPage() {
               <h3 className="font-['Montserrat'] text-[24px] font-[700]">AI Intelligence</h3>
             </div>
             <p className="text-subtext-color font-['Montserrat'] text-[16px] leading-[24px]">
-              AI-guided workflows for VAT, payroll, and compliance summaries—grounded in your synced company data—with Google Gemini powering natural-language answers tuned to Solana + Palm USD payouts.
+              AI-guided workflows for VAT, payroll, and compliance summaries—grounded in your synced company data—with Google Gemini powering natural-language answers tuned to BOT Chain + USDT payouts.
             </p>
             <div className="flex flex-wrap gap-2 mt-auto">
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">Tax Compliance</span>
@@ -295,7 +295,7 @@ function GemetraLandingPage() {
                 </span>
                 <span className="whitespace-pre-wrap font-['Montserrat'] text-[18px] font-[400] leading-[26px] text-subtext-color -tracking-[0.01em]">
                   {
-                    "Gemetra unifies VAT refunds for tourists and global payroll automation on a single trustless platform. Powered by Solana and Palm USD (PUSD) for programmable money and AI-driven compliance."
+                    "Gemetra unifies VAT refunds for tourists and global payroll automation on a single trustless platform. Powered by BOT Chain and USDT for programmable money and AI-driven compliance."
                   }
                 </span>
 
@@ -396,7 +396,7 @@ function GemetraLandingPage() {
                   Instant Settlement
                 </h3>
                 <p className="text-subtext-color font-['Montserrat'] text-[16px] leading-[24px] mb-6">
-                  Experience secure and transparent VAT refunds and payroll transactions with Solana and Palm USD (PUSD). Settlement is always-on with near-instant confirmations.
+                  Experience secure and transparent VAT refunds and payroll transactions with BOT Chain and USDT. Settlement is always-on with near-instant confirmations.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
@@ -441,7 +441,7 @@ function GemetraLandingPage() {
                   Ultra-Low Transaction Fees
                 </h3>
                 <p className="text-subtext-color font-['Montserrat'] text-[16px] leading-[24px] mb-6">
-                  Transaction cost remains a fraction of a cent on modern rails. PUSD is designed as a non-freezable digital dollar with transparent reserve disclosures and multi-chain operability.
+                  Transaction cost remains a fraction of a cent on modern rails. USDT is designed as a non-freezable digital dollar with transparent reserve disclosures and multi-chain operability.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
@@ -649,7 +649,7 @@ function GemetraLandingPage() {
                     </div>
                     <div>
                       <h4 className="font-['Montserrat'] text-[18px] font-[600] text-default-font">On-chain Payout</h4>
-                      <p className="text-subtext-color">Tourist receives PUSD stablecoin with fast finality on Solana and native multi-chain support.</p>
+                      <p className="text-subtext-color">Tourist receives USDT stablecoin with fast finality on BOT Chain and native multi-chain support.</p>
                     </div>
                   </div>
                 </div>
@@ -659,7 +659,7 @@ function GemetraLandingPage() {
                 <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-100">
                   <h4 className="font-['Montserrat'] text-[16px] font-[700] text-default-font mb-2">Real-World Example</h4>
                   <p className="text-subtext-color mb-4">
-                    A Japanese tourist purchases a luxury watch in Dubai Mall for AED 50,000 (incl. 5% VAT = AED 2,500). Using Gemetra, they scan the VAT tag at Dubai Airport and receive AED 2,125 (85% of VAT) in PUSD directly to their wallet before boarding their flight.
+                    A Japanese tourist purchases a luxury watch in Dubai Mall for AED 50,000 (incl. 5% VAT = AED 2,500). Using Gemetra, they scan the VAT tag at Dubai Airport and receive AED 2,125 (85% of VAT) in USDT directly to their wallet before boarding their flight.
                   </p>
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 bg-green-50 rounded-full text-xs font-medium text-green-700">4s PAYOUT</span>
@@ -804,7 +804,7 @@ function GemetraLandingPage() {
             Dual Workflows with Gemetra
           </span>
           <p className="max-w-[768px] text-center text-subtext-color font-['Montserrat'] text-[18px] leading-[28px]">
-            Our platform handles both VAT refunds and global payroll with streamlined, automated processes built on Solana and Palm USD (PUSD)
+            Our platform handles both VAT refunds and global payroll with streamlined, automated processes built on BOT Chain and USDT
           </p>
         </div>
 
@@ -909,7 +909,7 @@ function GemetraLandingPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="col-span-2">
                             <p className="text-subtext-color mb-4">
-                              Once validated, the smart contract computes the refund amount (VAT * rate - fee) and the tourist receives PUSD stablecoin. The treasury disburses funds efficiently with fast finality, ensuring the tourist receives their refund before boarding their flight.
+                              Once validated, the smart contract computes the refund amount (VAT * rate - fee) and the tourist receives USDT stablecoin. The treasury disburses funds efficiently with fast finality, ensuring the tourist receives their refund before boarding their flight.
                             </p>
                             <div className="flex flex-wrap gap-3">
                               <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">SPL / NATIVE TRANSFERS</span>
@@ -922,7 +922,7 @@ function GemetraLandingPage() {
                             <ul className="space-y-2 text-sm text-subtext-color">
                               <li>• 85-87% of VAT amount</li>
                               <li>• ~AED 4.80 tag fee</li>
-                              <li>• PUSD stablecoin payments</li>
+                              <li>• USDT stablecoin payments</li>
                               <li>• Transaction notes with claim_id</li>
                             </ul>
                           </div>
@@ -969,7 +969,7 @@ function GemetraLandingPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="col-span-2">
                             <p className="text-subtext-color mb-4">
-                              The HR department uploads payroll data in CSV format or through contracts into the Gemetra dashboard. The AI layer parses gross salary, deductions, and tax rules by jurisdiction, then produces a structured transaction plan with net salaries in PUSD and any necessary FX conversions.
+                              The HR department uploads payroll data in CSV format or through contracts into the Gemetra dashboard. The AI layer parses gross salary, deductions, and tax rules by jurisdiction, then produces a structured transaction plan with net salaries in USDT and any necessary FX conversions.
                             </p>
                             <div className="flex flex-wrap gap-3">
                               <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">AI PARSING</span>
@@ -1003,7 +1003,7 @@ function GemetraLandingPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="col-span-2">
                             <p className="text-subtext-color mb-4">
-                              The CFO and HR department must both approve the payrun to ensure security and accuracy. Once approved, a payrun_id snapshot is stored in both Supabase and on-chain as an immutable reference. The planner then processes recipients with PUSD stablecoin transfers for efficient payroll distribution.
+                              The CFO and HR department must both approve the payrun to ensure security and accuracy. Once approved, a payrun_id snapshot is stored in both Supabase and on-chain as an immutable reference. The planner then processes recipients with USDT stablecoin transfers for efficient payroll distribution.
                             </p>
                             <div className="flex flex-wrap gap-3">
                               <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">DUAL APPROVAL</span>

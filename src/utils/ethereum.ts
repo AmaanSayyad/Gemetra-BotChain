@@ -1,225 +1,227 @@
-import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { getSolanaRpcUrl } from "../config/solanaRpc";
-import { getSolanaWalletBridge } from "../solana/solanaWalletBridge";
 import {
-  createAssociatedTokenAccountInstruction,
-  createTransferCheckedInstruction,
-  getAssociatedTokenAddress,
-  getMint,
-  TOKEN_2022_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+  createPublicClient,
+  createWalletClient,
+  custom,
+  http,
+  parseUnits,
+  formatUnits,
+  isAddress,
+  getAddress,
+  erc20Abi,
+  type Address,
+  type Hex,
+} from "viem";
+import {
+  botChain,
+  BOT_CHAIN_ID,
+  BOT_CHAIN_RPC,
+  BOTCHAIN_USDT_ADDRESS,
+  BOTCHAIN_USDT_DECIMALS,
+} from "../config/botchain";
 
-type LegacyInjectedSolana = {
-  publicKey?: PublicKey;
-  connect: () => Promise<{ publicKey: PublicKey }>;
-  disconnect?: () => Promise<void>;
-  sendTransaction?: (tx: Transaction, connection: Connection) => Promise<string>;
-  signAndSendTransaction?: (tx: Transaction) => Promise<{ signature: string }>;
-};
+const GEMETRA_CORE_ABI = [
+  {
+    type: "function",
+    name: "disburse",
+    stateMutability: "payable",
+    inputs: [
+      { name: "token", type: "address" },
+      { name: "recipients", type: "address[]" },
+      { name: "amounts", type: "uint256[]" },
+      { name: "ref", type: "bytes32" },
+      { name: "kind", type: "string" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "recordVatRefund",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "claimId", type: "bytes32" },
+      { name: "recipient", type: "address" },
+      { name: "token", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "receiptRef", type: "string" },
+    ],
+    outputs: [],
+  },
+] as const;
 
-const SOLANA_RPC_URL = getSolanaRpcUrl();
-const connection = new Connection(SOLANA_RPC_URL, "confirmed");
+export const BOTCHAIN_USDT = BOTCHAIN_USDT_ADDRESS;
+/** @deprecated Use BOTCHAIN_USDT */
+export const PUSD_SOLANA_MINT = BOTCHAIN_USDT_ADDRESS;
+export const MNEE_CONTRACT_ADDRESS_MAINNET = BOTCHAIN_USDT_ADDRESS;
+export const USDT_SOLANA_MINT = BOTCHAIN_USDT_ADDRESS;
+export const PUSD_ETHEREUM_CONTRACT = BOTCHAIN_USDT_ADDRESS;
 
-const getLegacyInjectedSolana = (): LegacyInjectedSolana | null =>
-  typeof window !== "undefined"
-    ? ((window as unknown as { solana?: LegacyInjectedSolana }).solana ?? null)
-    : null;
+export type PaymentToken = "USDT" | "BOT";
 
-async function resolveTransactionSigner(): Promise<{
-  publicKey: PublicKey;
-  sendTransaction: (tx: Transaction, conn: Connection) => Promise<string>;
-}> {
-  const bridge = getSolanaWalletBridge();
-  if (bridge?.publicKey && bridge.sendTransaction) {
-    return {
-      publicKey: bridge.publicKey,
-      sendTransaction: (tx, conn) => bridge.sendTransaction(tx, conn),
-    };
-  }
-
-  const legacy = getLegacyInjectedSolana();
-  if (!legacy) throw new Error("No Solana wallet detected");
-  if (!legacy.publicKey) await legacy.connect();
-  if (!legacy.publicKey) throw new Error("Wallet not connected");
-
-  const sendTransaction = async (tx: Transaction, conn: Connection) => {
-    if (legacy.sendTransaction) return legacy.sendTransaction(tx, conn);
-    if (legacy.signAndSendTransaction) {
-      return (await legacy.signAndSendTransaction(tx)).signature;
-    }
-    throw new Error("Wallet does not support sending transactions");
-  };
-
-  return { publicKey: legacy.publicKey, sendTransaction };
+export function normalizePaymentToken(token?: string | null): PaymentToken {
+  const t = (token ?? "").trim().toUpperCase();
+  if (t === "BOT" || t === "NATIVE" || t === "SOL" || t === "ETH") return "BOT";
+  return "USDT";
 }
 
-function formatSolanaRpcFailure(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err);
-  if (/403|access forbidden|forbidden/i.test(msg)) {
-    return `${msg}. The Solana RPC rejected the request (common with restrictive public URLs). Add VITE_SOLANA_RPC_URL in .env (Helius, QuickNode, etc.) and restart the dev server.`;
-  }
-  return msg;
+export function getGemetraCoreAddress(): Address | null {
+  const raw = (import.meta.env.VITE_GEMETRA_CORE_ADDRESS as string | undefined)?.trim();
+  if (raw && isAddress(raw)) return getAddress(raw);
+  return null;
 }
 
-export const PUSD_SOLANA_MINT =
-  "CZzgUBvxaMLwMhVSLgqJn3npmxoTo6nzMNQPAnwtHF3s";
-// Backward-compatible export name.
-export const MNEE_CONTRACT_ADDRESS_MAINNET = PUSD_SOLANA_MINT;
-/** Native USDT (SPL) on Solana mainnet — classic Token program. */
-export const USDT_SOLANA_MINT = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB";
-export const PUSD_ETHEREUM_CONTRACT = "0xfaf0cee6b20e2aaa4b80748a6af4cd89609a3d78";
-export type PaymentToken = "PUSD" | "SOL";
+const publicClient = createPublicClient({
+  chain: botChain,
+  transport: http(BOT_CHAIN_RPC),
+});
 
-export const getPusdMintAddress = async (): Promise<string> =>
-  PUSD_SOLANA_MINT;
+function getEthereumProvider(): { request: (...args: unknown[]) => Promise<unknown> } {
+  if (typeof window === "undefined" || !window.ethereum) {
+    throw new Error("No EVM wallet detected. Install MetaMask or BO Wallet.");
+  }
+  return window.ethereum as { request: (...args: unknown[]) => Promise<unknown> };
+}
 
-export const getMneeContractAddress = getPusdMintAddress;
+async function getWalletClient() {
+  const provider = getEthereumProvider();
+  return createWalletClient({
+    chain: botChain,
+    transport: custom(provider),
+  });
+}
 
-export const isValidSolanaAddress = (address: string): boolean => {
+export async function ensureBotChain(): Promise<void> {
+  const provider = getEthereumProvider();
+  const hexId = `0x${BOT_CHAIN_ID.toString(16)}`;
   try {
-    new PublicKey(address);
-    return true;
-  } catch {
-    return false;
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: hexId }],
+    });
+  } catch (err) {
+    const code = (err as { code?: number })?.code;
+    if (code === 4902) {
+      await provider.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: hexId,
+            chainName: "BOT Chain",
+            nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
+            rpcUrls: [BOT_CHAIN_RPC],
+            blockExplorerUrls: ["https://scan.botchain.ai"],
+          },
+        ],
+      });
+      return;
+    }
+    throw err;
   }
-};
-export const isValidEthereumAddress = isValidSolanaAddress;
+}
+
+export const isValidEthereumAddress = (address: string): boolean =>
+  Boolean(address && isAddress(address));
+
+/** Kept so existing call sites compile; validates BOT Chain / EVM addresses. */
+export const isValidSolanaAddress = isValidEthereumAddress;
 
 export const formatAddress = (address: string): string =>
-  address ? `${address.slice(0, 4)}...${address.slice(-4)}` : "";
+  address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
 
-export const getConnectedAccount = (): string | null =>
-  getSolanaWalletBridge()?.publicKey?.toBase58() ??
-  getLegacyInjectedSolana()?.publicKey?.toBase58() ??
-  null;
+export const getConnectedAccount = (): string | null => {
+  if (typeof window === "undefined") return null;
+  const eth = window.ethereum as { selectedAddress?: string } | undefined;
+  const selected = eth?.selectedAddress;
+  return selected && isAddress(selected) ? getAddress(selected) : null;
+};
 
 export const isWalletConnected = (): boolean => Boolean(getConnectedAccount());
 
-async function getSplMintProgramId(mint: PublicKey): Promise<PublicKey> {
-  const mintAcct = await connection.getAccountInfo(mint, "confirmed");
-  if (!mintAcct) return TOKEN_PROGRAM_ID;
-  return mintAcct.owner.equals(TOKEN_2022_PROGRAM_ID)
-    ? TOKEN_2022_PROGRAM_ID
-    : TOKEN_PROGRAM_ID;
+async function resolveSender(): Promise<Address> {
+  await ensureBotChain();
+  const wallet = await getWalletClient();
+  const [account] = await wallet.getAddresses();
+  if (!account) throw new Error("Wallet not connected");
+  return getAddress(account);
 }
 
-/** ATA balance for an SPL mint (classic or Token-2022). */
-export async function getSplTokenBalanceUi(
-  ownerBase58: string,
-  mintBase58: string
-): Promise<number> {
+export const getPusdMintAddress = async (): Promise<string> => BOTCHAIN_USDT_ADDRESS;
+export const getMneeContractAddress = getPusdMintAddress;
+
+export async function getErc20BalanceUi(owner: string, token: Address, decimals: number): Promise<number> {
   try {
-    if (!ownerBase58) return 0;
-    const owner = new PublicKey(ownerBase58);
-    const mint = new PublicKey(mintBase58);
-    const programId = await getSplMintProgramId(mint);
-    const tokenAccount = await getAssociatedTokenAddress(mint, owner, false, programId);
-    const info = await connection.getTokenAccountBalance(tokenAccount);
-    return Number(info.value.uiAmount ?? 0);
+    if (!owner || !isAddress(owner)) return 0;
+    const raw = await publicClient.readContract({
+      address: token,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [getAddress(owner)],
+    });
+    return Number(formatUnits(raw, decimals));
   } catch {
     return 0;
   }
 }
 
 export const getPusdBalance = async (address?: string): Promise<number> =>
-  getSplTokenBalanceUi(address ?? getConnectedAccount() ?? "", PUSD_SOLANA_MINT);
+  getErc20BalanceUi(address ?? getConnectedAccount() ?? "", BOTCHAIN_USDT_ADDRESS, BOTCHAIN_USDT_DECIMALS);
 export const getMneeBalance = getPusdBalance;
+export const getUsdtBalance = getPusdBalance;
 
-export const getUsdtBalance = async (address?: string): Promise<number> =>
-  getSplTokenBalanceUi(address ?? getConnectedAccount() ?? "", USDT_SOLANA_MINT);
-
-const sendSplTransfer = async (
-  recipient: string,
-  amount: number
-): Promise<string> => {
-  const { publicKey: sender, sendTransaction } = await resolveTransactionSigner();
-  const recipientPk = new PublicKey(recipient);
-  const mintPk = new PublicKey(PUSD_SOLANA_MINT);
-  const tokenProgram = await getSplMintProgramId(mintPk);
-  const mintInfo = await getMint(connection, mintPk, "confirmed", tokenProgram);
-  const senderAta = await getAssociatedTokenAddress(mintPk, sender, false, tokenProgram);
-  const recipientAta = await getAssociatedTokenAddress(mintPk, recipientPk, false, tokenProgram);
-  const tx = new Transaction();
-
-  const recipientAtaInfo = await connection.getAccountInfo(recipientAta);
-  if (!recipientAtaInfo) {
-    tx.add(
-      createAssociatedTokenAccountInstruction(
-        sender,
-        recipientAta,
-        recipientPk,
-        mintPk,
-        tokenProgram
-      )
-    );
+function toTokenAmount(amount: number, token: PaymentToken): bigint {
+  if (!amount || Number.isNaN(amount) || amount <= 0) {
+    throw new Error("Invalid amount");
   }
+  const decimals = token === "BOT" ? 18 : BOTCHAIN_USDT_DECIMALS;
+  return parseUnits(amount.toFixed(decimals), decimals);
+}
 
-  const baseAmount = BigInt(Math.floor(amount * 10 ** mintInfo.decimals));
-  tx.add(
-    createTransferCheckedInstruction(
-      senderAta,
-      mintPk,
-      recipientAta,
-      sender,
-      baseAmount,
-      mintInfo.decimals,
-      [],
-      tokenProgram
-    )
-  );
-
-  tx.feePayer = sender;
-  tx.recentBlockhash = (await connection.getLatestBlockhash("finalized")).blockhash;
-
-  return sendTransaction(tx, connection);
+const sendNativeTransfer = async (recipient: string, amount: number): Promise<Hex> => {
+  if (!isAddress(recipient)) throw new Error("Invalid BOT Chain wallet address");
+  const sender = await resolveSender();
+  const wallet = await getWalletClient();
+  return wallet.sendTransaction({
+    account: sender,
+    to: getAddress(recipient),
+    value: toTokenAmount(amount, "BOT"),
+    chain: botChain,
+  });
 };
 
-const sendSolTransfer = async (
-  recipient: string,
-  amount: number
-): Promise<string> => {
-  const { publicKey: sender, sendTransaction } = await resolveTransactionSigner();
-  const recipientPk = new PublicKey(recipient);
-  const lamports = Math.floor(amount * 1_000_000_000);
-  if (lamports <= 0) throw new Error("Invalid amount");
-
-  const tx = new Transaction().add(
-    SystemProgram.transfer({
-      fromPubkey: sender,
-      toPubkey: recipientPk,
-      lamports,
-    })
-  );
-
-  tx.feePayer = sender;
-  tx.recentBlockhash = (await connection.getLatestBlockhash("finalized")).blockhash;
-
-  return sendTransaction(tx, connection);
+const sendUsdtTransfer = async (recipient: string, amount: number): Promise<Hex> => {
+  if (!isAddress(recipient)) throw new Error("Invalid BOT Chain wallet address");
+  const sender = await resolveSender();
+  const wallet = await getWalletClient();
+  return wallet.writeContract({
+    account: sender,
+    address: BOTCHAIN_USDT_ADDRESS,
+    abi: erc20Abi,
+    functionName: "transfer",
+    args: [getAddress(recipient), toTokenAmount(amount, "USDT")],
+    chain: botChain,
+  });
 };
 
 export const sendPayment = async (
   recipient: string,
   amount: number,
-  token: PaymentToken = "PUSD"
+  token: PaymentToken | string = "USDT"
 ): Promise<{ txHash: string; success: boolean; error?: string }> => {
   try {
-    if (!isValidSolanaAddress(recipient)) {
-      throw new Error("Invalid Solana wallet address");
+    const normalized = normalizePaymentToken(token);
+    if (!isValidEthereumAddress(recipient)) {
+      throw new Error("Invalid BOT Chain wallet address");
     }
-    if (!amount || Number.isNaN(amount) || amount <= 0) {
-      throw new Error("Invalid amount");
-    }
-    const signature =
-      token === "SOL"
-        ? await sendSolTransfer(recipient, amount)
-        : await sendSplTransfer(recipient, amount);
-    return { txHash: signature, success: true };
+    const hash =
+      normalized === "BOT"
+        ? await sendNativeTransfer(recipient, amount)
+        : await sendUsdtTransfer(recipient, amount);
+    await publicClient.waitForTransactionReceipt({ hash });
+    return { txHash: hash, success: true };
   } catch (error) {
     return {
       txHash: "",
       success: false,
-      error: formatSolanaRpcFailure(error),
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 };
@@ -228,12 +230,12 @@ export const sendMneePayment = async (
   recipient: string,
   amount: number
 ): Promise<{ txHash: string; success: boolean; error?: string }> => {
-  return sendPayment(recipient, amount, "PUSD");
+  return sendPayment(recipient, amount, "USDT");
 };
 
 export const sendBulkPayments = async (
   recipients: Array<{ address: string; amount: number }>,
-  token: PaymentToken = "PUSD"
+  token: PaymentToken | string = "USDT"
 ): Promise<{
   txHash: string;
   txHashes: Array<{ address: string; txHash: string }>;
@@ -241,16 +243,78 @@ export const sendBulkPayments = async (
   processed: number;
   error?: string;
 }> => {
+  const normalized = normalizePaymentToken(token);
+  const valid = recipients.filter((item) => isValidEthereumAddress(item.address) && item.amount > 0);
   const txHashes: Array<{ address: string; txHash: string }> = [];
+
   try {
-    for (const item of recipients) {
-      if (!isValidSolanaAddress(item.address) || item.amount <= 0) continue;
-      const signature =
-        token === "SOL"
-          ? await sendSolTransfer(item.address, item.amount)
-          : await sendSplTransfer(item.address, item.amount);
-      txHashes.push({ address: item.address, txHash: signature });
+    const core = getGemetraCoreAddress();
+    if (core && valid.length > 0) {
+      const sender = await resolveSender();
+      const wallet = await getWalletClient();
+      const tokenAddress = normalized === "BOT" ? ("0x0000000000000000000000000000000000000000" as Address) : BOTCHAIN_USDT_ADDRESS;
+      const amounts = valid.map((item) => toTokenAmount(item.amount, normalized));
+      const addrs = valid.map((item) => getAddress(item.address));
+      const total = amounts.reduce((acc, n) => acc + n, 0n);
+
+      if (normalized === "USDT") {
+        const allowance = await publicClient.readContract({
+          address: BOTCHAIN_USDT_ADDRESS,
+          abi: erc20Abi,
+          functionName: "allowance",
+          args: [sender, core],
+        });
+        if (allowance < total) {
+          const approveHash = await wallet.writeContract({
+            account: sender,
+            address: BOTCHAIN_USDT_ADDRESS,
+            abi: erc20Abi,
+            functionName: "approve",
+            args: [core, total],
+            chain: botChain,
+          });
+          await publicClient.waitForTransactionReceipt({ hash: approveHash });
+        }
+      }
+
+      const hash = await wallet.writeContract({
+        account: sender,
+        address: core,
+        abi: GEMETRA_CORE_ABI,
+        functionName: "disburse",
+        args: [
+          tokenAddress,
+          addrs,
+          amounts,
+          `0x${crypto.randomUUID().replace(/-/g, "").padEnd(64, "0")}` as Hex,
+          "payroll",
+        ],
+        value: normalized === "BOT" ? total : 0n,
+        chain: botChain,
+      });
+      await publicClient.waitForTransactionReceipt({ hash });
+      return {
+        txHash: hash,
+        txHashes: valid.map((item) => ({ address: item.address, txHash: hash })),
+        success: true,
+        processed: valid.length,
+      };
     }
+
+    for (const item of valid) {
+      const result = await sendPayment(item.address, item.amount, normalized);
+      if (!result.success) {
+        return {
+          txHash: txHashes[0]?.txHash ?? "",
+          txHashes,
+          success: txHashes.length > 0,
+          processed: txHashes.length,
+          error: result.error || "Some payments failed",
+        };
+      }
+      txHashes.push({ address: item.address, txHash: result.txHash });
+    }
+
     return {
       txHash: txHashes[0]?.txHash ?? "",
       txHashes,
@@ -264,33 +328,27 @@ export const sendBulkPayments = async (
       txHashes,
       success: txHashes.length > 0,
       processed: txHashes.length,
-      error: formatSolanaRpcFailure(error),
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 };
 
 export const sendBulkMneePayments = async (
   recipients: Array<{ address: string; amount: number }>
-): Promise<{
-  txHash: string;
-  txHashes: Array<{ address: string; txHash: string }>;
-  success: boolean;
-  processed: number;
-  error?: string;
-}> => {
-  return sendBulkPayments(recipients, "PUSD");
-};
+) => sendBulkPayments(recipients, "USDT");
 
 export const getAccountBalance = async (
   address?: string
 ): Promise<{ eth: number; mnee: number; usdt: number }> => {
   try {
     const owner = address ?? getConnectedAccount() ?? "";
-    if (!owner) return { eth: 0, mnee: 0, usdt: 0 };
-    const target = new PublicKey(owner);
-    const lamports = await connection.getBalance(target);
-    const [mnee, usdt] = await Promise.all([getMneeBalance(owner), getUsdtBalance(owner)]);
-    return { eth: lamports / 1_000_000_000, mnee, usdt };
+    if (!owner || !isAddress(owner)) return { eth: 0, mnee: 0, usdt: 0 };
+    const target = getAddress(owner);
+    const [native, usdt] = await Promise.all([
+      publicClient.getBalance({ address: target }),
+      getUsdtBalance(target),
+    ]);
+    return { eth: Number(formatUnits(native, 18)), mnee: usdt, usdt };
   } catch {
     return { eth: 0, mnee: 0, usdt: 0 };
   }
@@ -298,3 +356,40 @@ export const getAccountBalance = async (
 
 export const formatMnee = (amount: number): string => amount.toFixed(2);
 export const formatEth = (amount: number): string => amount.toFixed(6);
+
+export async function recordVatRefundOnChain(opts: {
+  claimId: string;
+  recipient: string;
+  amount: number;
+  token: PaymentToken | string;
+  receiptRef: string;
+}): Promise<string | null> {
+  const core = getGemetraCoreAddress();
+  if (!core || !isAddress(opts.recipient)) return null;
+  try {
+    const sender = await resolveSender();
+    const wallet = await getWalletClient();
+    const normalized = normalizePaymentToken(opts.token);
+    const tokenAddress =
+      normalized === "BOT" ? ("0x0000000000000000000000000000000000000000" as Address) : BOTCHAIN_USDT_ADDRESS;
+    const idHex = `0x${opts.claimId.replace(/-/g, "").padEnd(64, "0").slice(0, 64)}` as Hex;
+    const hash = await wallet.writeContract({
+      account: sender,
+      address: core,
+      abi: GEMETRA_CORE_ABI,
+      functionName: "recordVatRefund",
+      args: [
+        idHex,
+        getAddress(opts.recipient),
+        tokenAddress,
+        toTokenAmount(opts.amount, normalized),
+        opts.receiptRef,
+      ],
+      chain: botChain,
+    });
+    await publicClient.waitForTransactionReceipt({ hash });
+    return hash;
+  } catch {
+    return null;
+  }
+}

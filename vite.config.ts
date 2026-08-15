@@ -8,7 +8,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      wagmi: resolve(__dirname, "./src/lib/wagmi-compat.ts"),
       buffer: resolve(__dirname, "node_modules/buffer"),
     },
   },

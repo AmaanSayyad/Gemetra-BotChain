@@ -182,7 +182,7 @@ export const BulkUploadModal: React.FC<BulkUploadModalProps> = ({
         }
         
         if (!employee.wallet_address || !isValidSolanaAddress(employee.wallet_address)) {
-          rowErrors.push(`Row ${i + 1}: Valid Solana address is required (got: "${employee.wallet_address}")`);
+          rowErrors.push(`Row ${i + 1}: Valid BOT Chain address is required (got: "${employee.wallet_address}")`);
         }
         
         if (employee.salary <= 0 || isNaN(employee.salary)) {

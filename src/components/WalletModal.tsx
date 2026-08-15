@@ -59,9 +59,6 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => 
   const getWalletName = (connector: any): string | null => {
     const connectorId = connector.id.toLowerCase();
     const connectorName = (connector.name || '').toLowerCase();
-    if (connectorId === 'solana-wallet-adapter' || connectorName.includes('solana wallets')) {
-      return 'Solana wallets';
-    }
     if (connectorId.includes('phantom') || connectorName.includes('phantom')) {
       return 'Phantom';
     }
@@ -114,9 +111,6 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => 
     // Check connector ID and name for wallet identification
     const connectorId = connector.id.toLowerCase();
     const connectorName = (connector.name || '').toLowerCase();
-    if (connectorId === 'solana-wallet-adapter' || connectorName.includes('solana wallets')) {
-      return '/solana-sol-logo.png';
-    }
     if (connectorId.includes('phantom') || connectorName.includes('phantom')) {
       return '/Phantom-Integration-Assets/Icons/Phantom-Icon_Square.svg';
     }
@@ -157,10 +151,6 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => 
   };
 
   const getWalletDescription = (connector: any): string => {
-    const cid = String(connector.id || '').toLowerCase();
-    if (cid === 'solana-wallet-adapter') {
-      return 'Phantom, Solflare, Ledger, WalletConnect (mobile), Coinbase, and other Solana wallets';
-    }
     if (connector.id === 'injected') {
       if (typeof window !== 'undefined') {
         if ((window as any).solana?.isPhantom) return 'Connect using Phantom wallet';
@@ -183,7 +173,6 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => 
     if (!walletName) return 999; // Filtered wallets go to the end
     
     const lowerName = walletName.toLowerCase();
-    if (lowerName.includes('solana wallets')) return 0;
     if (lowerName.includes('phantom')) return 1;
     if (lowerName.includes('metamask')) return 1;
     if (lowerName.includes('nightly')) return 2;
@@ -302,7 +291,7 @@ export const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose }) => 
                 </p>
                 <div className="mt-3 text-center">
                   <a
-                    href="https://solana.com/solana-wallets"
+                    href="https://wallet.botchain.ai/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-gray-900 underline"

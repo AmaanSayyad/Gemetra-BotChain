@@ -3,7 +3,8 @@ import { RefreshCw, Check, X, Users, DollarSign, AlertCircle, CheckCircle } from
 import { motion, AnimatePresence } from 'framer-motion';
 import { PaymentPreviewModal } from './PaymentPreviewModal';
 import { PaymentSuccessModal } from './PaymentSuccessModal';
-import { PUSD_SOLANA_MINT, type PaymentToken } from '../utils/ethereum';
+import { BOTCHAIN_USDT, type PaymentToken } from '../utils/ethereum';
+import { BOT_CHAIN_ID } from '../config/botchain';
 import { useChainId } from 'wagmi';
 import type { Employee } from '../lib/supabase';
 
@@ -29,19 +30,19 @@ interface BulkTransferProps {
 // Network Warning Component
 const NetworkWarning: React.FC<{ selectedToken: PaymentToken }> = ({ selectedToken }) => {
   const chainId = useChainId();
-  const isSolanaMainnet = Number(chainId) === 101;
+  const isBotMainnet = Number(chainId) === BOT_CHAIN_ID;
   
-  if (isSolanaMainnet) {
+  if (isBotMainnet) {
     return (
       <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center space-x-2">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-          <span className="text-green-800 font-medium text-sm sm:text-base">Connected to Solana Mainnet</span>
+          <span className="text-green-800 font-medium text-sm sm:text-base">Connected to BOT Chain Mainnet</span>
         </div>
         <p className="text-green-700 text-xs sm:text-sm mt-1">
-          {selectedToken === 'PUSD'
-            ? <>Using real PUSD tokens. Mint: <code className="text-xs bg-green-100 px-1 rounded">{PUSD_SOLANA_MINT.slice(0, 10)}...</code></>
-            : <>Using native SOL transfers on Solana mainnet.</>}
+          {selectedToken === 'USDT'
+            ? <>Using BOT Chain USDT. Contract: <code className="text-xs bg-green-100 px-1 rounded">{BOTCHAIN_USDT.slice(0, 10)}...</code></>
+            : <>Using native BOT transfers on BOT Chain mainnet.</>}
         </p>
       </div>
     );
@@ -54,7 +55,7 @@ const NetworkWarning: React.FC<{ selectedToken: PaymentToken }> = ({ selectedTok
         <span className="text-red-800 font-medium text-sm sm:text-base">Wrong Network</span>
       </div>
       <p className="text-red-700 text-xs sm:text-sm mt-1">
-        Please switch to <strong>Solana Mainnet</strong> to use real {selectedToken} transfers.
+        Please switch to <strong>BOT Chain Mainnet</strong> to use real {selectedToken} transfers.
       </p>
     </div>
   );
@@ -69,7 +70,7 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
   onPaymentSuccess
 }) => {
   const [bulkEmployees, setBulkEmployees] = useState<BulkTransferEmployee[]>([]);
-  const [selectedToken, setSelectedToken] = useState<PaymentToken>('PUSD');
+  const [selectedToken, setSelectedToken] = useState<PaymentToken>('USDT');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -223,26 +224,26 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
-                      onClick={() => setSelectedToken('PUSD')}
-                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'PUSD' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      onClick={() => setSelectedToken('USDT')}
+                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'USDT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
                       <img
-                        src="/pusd.svg"
-                        alt="PUSD"
+                        src="/usdt.png"
+                        alt="USDT"
                         className="w-4 h-4 object-contain"
                       />
-                      <span>PUSD</span>
+                      <span>USDT</span>
                     </button>
                     <button
-                      onClick={() => setSelectedToken('SOL')}
-                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'SOL' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      onClick={() => setSelectedToken('BOT')}
+                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
                       <img
-                        src="/solana-sol-logo.png"
-                        alt="SOL"
+                        src="/bot-token.svg"
+                        alt="BOT"
                         className="w-4 h-4 object-contain"
                       />
-                      <span>SOL</span>
+                      <span>BOT</span>
                     </button>
                   </div>
                 </div>
@@ -272,7 +273,7 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
                   <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Network Fees:</span>
-                      <span className="text-gray-900">~{(selectedEmployees.length * 0.000005).toFixed(6)} SOL</span>
+                      <span className="text-gray-900">~{(selectedEmployees.length * 0.00002).toFixed(6)} BOT</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Processing Time:</span>
@@ -362,16 +363,16 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
                             <div className="text-right">
                               <div className="font-semibold text-gray-900 text-sm sm:text-base">${employee.amount.toLocaleString()}</div>
                               <div className="flex items-center space-x-1">
-                                {selectedToken.toUpperCase() === 'PUSD' ? (
+                                {selectedToken.toUpperCase() === 'USDT' ? (
                                   <img 
-                                    src="/pusd.svg" 
-                                    alt="PUSD"
+                                    src="/usdt.png" 
+                                    alt="USDT"
                                     className="w-4 h-4 rounded-full object-cover"
                                   />
-                                ) : selectedToken.toUpperCase() === 'SOL' ? (
+                                ) : selectedToken.toUpperCase() === 'BOT' ? (
                                   <img 
-                                    src="/solana-sol-logo.png" 
-                                    alt="SOL"
+                                    src="/bot-token.svg" 
+                                    alt="BOT"
                                     className="w-4 h-4 rounded-full object-cover"
                                   />
                                 ) : null}

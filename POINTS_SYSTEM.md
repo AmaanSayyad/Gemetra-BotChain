@@ -1,10 +1,10 @@
-# Points & rewards (Gemetra / PUSD)
+# Points & rewards (Gemetra / USDT)
 
 ## Overview
 
-Gemetra includes a lightweight points layer on top of payroll, scheduled payments, and VAT refunds. Points are tracked per **wallet** and surfaced in the top bar. Conversion is denominated as **PUSD** in the UI (Palm USD on Solana); some database columns and internal names still say **MNEE** as legacy labels.
+Gemetra includes a lightweight points layer on top of payroll, scheduled payments, and VAT refunds. Points are tracked per **wallet** and surfaced in the top bar. Conversion is denominated as **USDT** in the UI (BOT Chain bridged USDT); some database columns and internal names still say **MNEE** as legacy labels.
 
-**Payment token vs points:** Payroll, scheduled runs, and VAT refunds can record `payments.token` as **`PUSD`** or **`SOL`** when you pick the token in the UI. Points earning rules are unchanged; **point conversion** still targets **PUSD** (not SOL).
+**Payment token vs points:** Payroll, scheduled runs, and VAT refunds can record `payments.token` as **`USDT`** or **`BOT`** when you pick the token in the UI. Points earning rules are unchanged; **point conversion** still targets **USDT** (not BOT).
 
 Authoritative earning rules live in **`src/hooks/usePoints.ts`** (`POINTS_RULES`).
 

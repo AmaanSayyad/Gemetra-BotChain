@@ -80,7 +80,7 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
           {
             id: 'initial-ai-message',
             type: 'assistant',
-            content: `Hello — I'm **${companyName}'s** in-app assistant on Gemetra (Google **Gemini**). I can summarize **your** employees, payments, and VAT-style workflows; explain **Solana** payouts in **PUSD (Palm USD)** or **SOL**; and walk through connecting any **Solana Wallet Adapter** wallet (Phantom, Solflare, Ledger, WalletConnect, etc.). I won't invent circulation, TVL, or partnership claims. What should we tackle first?`,
+            content: `Hello — I'm **${companyName}'s** in-app assistant on Gemetra (Google **Gemini**). I can summarize **your** employees, payments, and VAT-style workflows; explain **BOT Chain** payouts in **USDT** or **BOT**; and walk through connecting MetaMask, BO Wallet, or WalletConnect. I won't invent circulation, TVL, or partnership claims. What should we tackle first?`,
             timestamp: new Date()
           }
         ]);
@@ -216,16 +216,16 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
 
   // Curated prompts grounded in this app's data + PUSD/Solana scope.
   const allAvailableQuestions = [
-    "What is PUSD?",
-    "Tell me about Palm USD",
-    "What is PUSD's Solana mint address?",
-    "Is PUSD available on Solana?",
+    "What is USDT on BOT Chain?",
+    "Tell me about BOT Chain USDT",
+    "What is the BOT Chain USDT contract?",
+    "Is USDT available on BOT Chain?",
     "What is the current price of SOL?",
-    "What are Solana transaction fees for payouts?",
+    "What are BOT Chain transaction fees for payouts?",
     "How do I connect my wallet?",
-    "How do I send tokens on Solana?",
+    "How do I send tokens on BOT Chain?",
     "What are SPL tokens?",
-    "What is Solana mainnet-beta?",
+    "What is BOT Chain mainnet?",
 
     // Company & employee prompts
     "How many employees do we have?",
@@ -294,7 +294,7 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
         ? [
             "How many employees do we have?",
             "Who is our highest paid employee?",
-            "What is PUSD?",
+            "What is USDT on BOT Chain?",
           ]
         : [
             "How many employees do we have?",
@@ -304,8 +304,8 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
             "Employee salary breakdown",
             "What is the total payroll amount?",
             "Show me employee statistics",
-            "What is PUSD?",
-            "What is PUSD's Solana mint address?",
+            "What is USDT on BOT Chain?",
+            "What is the BOT Chain USDT contract?",
             "When was the last payment made?",
           ];
       setDisplayedQuestions(initialQuestions);
@@ -569,7 +569,7 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
             placeholder={
               isMobile
                 ? "Message Gemetra AI…"
-                : "Ask about employees, payments, VAT flows, PUSD/SOL on Solana, or wallet setup…"
+                : "Ask about employees, payments, VAT flows, USDT/BOT on BOT Chain, or wallet setup…"
             }
             className="min-h-[2.75rem] max-h-40 flex-1 resize-y bg-gray-100 border border-gray-300 text-gray-900 rounded-lg px-3 py-2 sm:px-4 sm:py-3 focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base leading-snug"
             disabled={isLoading}

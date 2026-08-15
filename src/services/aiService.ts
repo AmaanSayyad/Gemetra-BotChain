@@ -216,7 +216,7 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
     return {
       shouldAnswer: true,
       directAnswer: "pusd_info",
-      reasoning: "User asking about Palm USD / PUSD (or legacy MNEE wording) for this app.",
+      reasoning: "User asking about Palm USD / USDT (or legacy MNEE wording) for this app.",
     };
   }
 
@@ -265,7 +265,7 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
     return {
       shouldAnswer: true,
       directAnswer: "founder",
-      reasoning: "Founder / protocol origin question — disambiguate Solana vs Ethereum vs PUSD.",
+      reasoning: "Founder / protocol origin question — disambiguate BOT Chain vs Ethereum vs USDT.",
     };
   }
   
@@ -354,7 +354,7 @@ const buildGeminiUserTurnContext = (context: AIContext): string => {
               context.employees.find((e) => e.id === payment.employee_id)?.name ||
               payment.employee_id ||
               "Employee";
-            const tok = payment.token || "PUSD";
+            const tok = payment.token || "USDT";
             const when = payment.payment_date || payment.created_at || "N/A";
             return `- ${tok} ${payment.amount} → ${emp} (${payment.status}) @ ${when}`;
           })
@@ -391,7 +391,7 @@ const handleIntelligentQueries = async (message: string, context: AIContext): Pr
   
   if (thinking.directAnswer === "pusd_info") {
     const pusdReply = formatPusdInfoReply();
-    thinkingContext.establishedFacts["payroll_stablecoin"] = "PUSD on Solana (Palm USD)";
+    thinkingContext.establishedFacts["payroll_stablecoin"] = "USDT on BOT Chain";
     thinkingContext.primaryCrypto = "solana";
     addToMemory(message, pusdReply, "pusd_info");
     return pusdReply;
@@ -451,9 +451,9 @@ ${distanceFromATH > -50 ? '💡 Still within reasonable distance of peak levels!
         break;
         
       case "founder": {
-        const founderResponse = `👤 **Solana context (for Gemetra)**
+        const founderResponse = `👤 **BOT Chain context (for Gemetra)**
 
-For this product, the relevant protocol context is **Solana**. Commonly cited Solana builders include **Anatoly Yakovenko** and **Raj Gokal**.
+For this product, the relevant protocol context is **BOT Chain**. Commonly cited BOT Chain builders include **Anatoly Yakovenko** and **Raj Gokal**.
 
 If you meant Palm USD governance or issuer details, use official sources: ${GEMETRA_APP_SNAPSHOT.docs[0]}.
 
@@ -501,14 +501,14 @@ I can also answer product-grounded questions such as payroll totals, employee st
         let response: string;
         if (coingeckoId === "palm-usd") {
           const ch = priceData.change24h >= 0 ? "+" : "";
-          response = `💵 **PUSD (Palm USD)** — spot quote (aggregator)
+          response = `💵 **USDT (Palm USD)** — spot quote (aggregator)
 
 • **USD:** ~$${priceData.price.toFixed(4)} (stablecoins hug $1; small drift is normal)
 • **24h:** ${ch}${priceData.change24h.toFixed(3)}%
 
-**In Gemetra (Solana mainnet‑beta)**  
-Mint: \`${GEMETRA_APP_SNAPSHOT.pusdMintSolana}\`  
-Explorer: ${GEMETRA_APP_SNAPSHOT.explorers.mintSolscan}`;
+**In Gemetra (BOT Chain mainnet‑beta)**  
+Mint: \`${GEMETRA_APP_SNAPSHOT.usdtAddress}\`  
+Explorer: ${GEMETRA_APP_SNAPSHOT.explorers.token}`;
           thinkingContext.establishedFacts["pusd_reference_price"] = String(priceData.price);
         } else {
           response = formatPriceResponse(priceData, coingeckoId);
@@ -528,9 +528,9 @@ Explorer: ${GEMETRA_APP_SNAPSHOT.explorers.mintSolscan}`;
 
 const fallbackResponses = {
   greeting: [
-    "Hello! I'm your Gemetra assistant. I can summarize your payroll/employee context, clarify how **Solana + PUSD (Palm USD)** payouts work here, fetch live spot prices where available, and keep answers grounded to your company data.",
-    "Hi — I'm your in-app analyst for Gemetra. Ask about employees, payments, or VAT-style flows; I explain **Solana** settlements via the **wallet adapter** (Phantom, Solflare, etc.) and **PUSD** without guessing protocol stats.",
-    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**Solana mainnet‑beta**, **PUSD** or **SOL** payouts). What should we unpack?",
+    "Hello! I'm your Gemetra assistant. I can summarize your payroll/employee context, clarify how **BOT Chain + USDT (Palm USD)** payouts work here, fetch live spot prices where available, and keep answers grounded to your company data.",
+    "Hi — I'm your in-app analyst for Gemetra. Ask about employees, payments, or VAT-style flows; I explain **BOT Chain** settlements via the **wallet adapter** (Phantom, Solflare, etc.) and **USDT** without guessing protocol stats.",
+    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**BOT Chain mainnet‑beta**, **USDT** or **SOL** payouts). What should we unpack?",
   ],
   clarification: [
     "I want to give you the most accurate information! Could you clarify which specific aspect you're interested in? 🤔",
@@ -689,7 +689,7 @@ const generateCompanyAnalytics = (context: AIContext) => {
       payrollGrowth: 0,
       totalPaid: 0,
       lastPayment: null,
-      companyDescription: `${companyName} operates Gemetra on **Solana** with **PUSD (Palm USD)** or **SOL** payouts (Solana Wallet Adapter–connected wallets; **SOL** for fees) for VAT + payroll workflows.`
+      companyDescription: `${companyName} operates Gemetra on **BOT Chain** with **USDT (Palm USD)** or **SOL** payouts (BOT Chain Wallet Adapter–connected wallets; **SOL** for fees) for VAT + payroll workflows.`
     };
   }
   
@@ -747,7 +747,7 @@ const generateCompanyAnalytics = (context: AIContext) => {
     lastPayment,
     completedPayments: completedPayments.length,
     pendingPayments: payments.filter(p => p.status === 'pending').length,
-    companyDescription: `${companyName} runs Gemetra — Solana‑native payroll/refund tooling that denominates disbursements in **PUSD** (or **SOL** when selected), keeps **SOL** for network fees, and connects through the **Solana Wallet Adapter**.`
+    companyDescription: `${companyName} runs Gemetra — BOT Chain‑native payroll/refund tooling that denominates disbursements in **USDT** (or **SOL** when selected), keeps **SOL** for network fees, and connects through the **BOT Chain Wallet Adapter**.`
   };
 };
 
@@ -779,19 +779,19 @@ function tryGemetraDomainAnswer(
     return `### Connect your wallet
 
 1. From the dashboard shell, use **Connect wallet** in the **header** or **sidebar** (or the wallet control on the landing hero when offered).
-2. Choose a wallet in the **Solana Wallet Adapter** modal (Phantom, Solflare, Ledger, etc.). If you configured \`VITE_WALLETCONNECT_PROJECT_ID\`, **WalletConnect** appears for mobile / QR flows.
+2. Choose a wallet in the **BOT Chain Wallet Adapter** modal (Phantom, Solflare, Ledger, etc.). If you configured \`VITE_WALLETCONNECT_PROJECT_ID\`, **WalletConnect** appears for mobile / QR flows.
 3. Approve the connection in the wallet app or browser extension.
-4. Use **Solana mainnet‑beta** and keep a small **SOL** balance for network fees.
+4. Use **BOT Chain mainnet‑beta** and keep a small **SOL** balance for network fees.
 
-After you connect, **PUSD** and **SOL** payouts are signed with that wallet in **Bulk transfer**, **VAT refund**, and **Scheduled payments** when you pick the token on each screen.`;
+After you connect, **USDT** and **SOL** payouts are signed with that wallet in **Bulk transfer**, **VAT refund**, and **Scheduled payments** when you pick the token on each screen.`;
   }
 
   if (/scheduled payment|recurring payment|payment schedule|calendar.*schedul/i.test(m) && /how|what|explain|work/i.test(m)) {
     return `### How scheduled payments work
 
 - Open **Scheduled payments** in the dashboard and create a **one-time** or **recurring** schedule (daily, weekly, bi-weekly, or monthly).
-- Set **amount**, **employee**, **date** (and **end date** for recurring), and the **token** (**PUSD** or **SOL**). Each run uses the token stored on that schedule.
-- Optional **pre-approval**: set separate **spending caps per token** (PUSD and SOL). While totals of due runs stay within those caps, the app can **auto-process** without asking you to sign again; otherwise you approve manually.
+- Set **amount**, **employee**, **date** (and **end date** for recurring), and the **token** (**USDT** or **SOL**). Each run uses the token stored on that schedule.
+- Optional **pre-approval**: set separate **spending caps per token** (USDT and SOL). While totals of due runs stay within those caps, the app can **auto-process** without asking you to sign again; otherwise you approve manually.
 - A background check looks for **due** items and processes them when your wallet is connected and balances cover the payout plus **SOL** fees.
 
 Use **Payments** / **Bulk transfer** for immediate batch sends outside the scheduler.`;
@@ -800,38 +800,38 @@ Use **Payments** / **Bulk transfer** for immediate batch sends outside the sched
   if (/\bspl tokens?\b|what (are|is) spl/i.test(m)) {
     return `### What are SPL tokens?
 
-**SPL** (**Solana Program Library**) tokens are fungible assets on Solana (similar in role to ERC-20s on Ethereum), controlled by the SPL Token / Token-2022 programs.
+**SPL** (**BOT Chain Program Library**) tokens are fungible assets on BOT Chain (similar in role to ERC-20s on Ethereum), controlled by the SPL Token / Token-2022 programs.
 
 In **Gemetra**, payroll and VAT payouts use:
 
-- **PUSD** — an SPL stablecoin (Palm USD) at mint \`${G.pusdMintSolana}\` (${G.tokenProgramSolana}).
+- **USDT** — an SPL stablecoin (Palm USD) at mint \`${G.usdtAddress}\` (${G.tokenProgram}).
 - **Native SOL** — not an SPL balance for transfers; the UI can still pay salaries/refunds in **SOL** using system transfers when you choose **SOL** as the payout token.
 
 Every SPL transfer still consumes a small amount of **SOL** for rent and transaction fees.`;
   }
 
   if (/mainnet-?beta|what is solana mainnet/i.test(m)) {
-    return `### Solana **mainnet-beta**
+    return `### BOT Chain **mainnet-beta**
 
-**mainnet-beta** is Solana’s primary production cluster: real **SOL** and real tokens (including **PUSD** SPL) live here. Transaction fees are paid in **SOL**; amounts are final and show on explorers like Solscan.
+**mainnet-beta** is BOT Chain’s primary production cluster: real **SOL** and real tokens (including **USDT** SPL) live here. Transaction fees are paid in **SOL**; amounts are final and show on explorers like Solscan.
 
 Gemetra’s payout flows in this app are intended for **mainnet-beta** (see product snapshot: **${G.payrollChain}**). Use devnet/testnet only if you deliberately point RPC and wallets there — not the default shipped UX.`;
   }
 
   if (/(how (do|can) i|)send.*(token|pusd|sol).*solana/i.test(m) || /send tokens? on solana/i.test(m)) {
-    return `### Sending tokens on Solana (and in Gemetra)
+    return `### Sending tokens on BOT Chain (and in Gemetra)
 
-**In general:** fund **SOL** for fees, hold the SPL mint you need (e.g. PUSD), use a wallet that supports SPL, and submit a token transfer to the recipient’s **associated token account** (ATA) for that mint.
+**In general:** fund **SOL** for fees, hold the SPL mint you need (e.g. USDT), use a wallet that supports SPL, and submit a token transfer to the recipient’s **associated token account** (ATA) for that mint.
 
-**In Gemetra:** you don’t paste raw instructions — use **Bulk transfer** or **VAT refund** with a connected wallet, pick **PUSD** or **SOL**, preview totals, then **sign** the transaction your wallet presents. The app builds the correct SPL or native transfer for each recipient.`;
+**In Gemetra:** you don’t paste raw instructions — use **Bulk transfer** or **VAT refund** with a connected wallet, pick **USDT** or **SOL**, preview totals, then **sign** the transaction your wallet presents. The app builds the correct SPL or native transfer for each recipient.`;
   }
 
   if (/(solana )?(transaction )?fees?|network fee|cost.*(payout|transfer).*solana/i.test(m)) {
-    return `### Solana fees for payouts
+    return `### BOT Chain fees for payouts
 
 - Every transaction costs a small amount of **SOL** (typically a fraction of a cent to a few cents at normal congestion — exact lamports vary by instruction count and account writes).
-- **SPL transfers** (e.g. **PUSD**) include the same base fee plus slightly more work than a simple SOL transfer; still usually very small in USD terms.
-- You cannot pay Solana protocol fees in **PUSD**; keep **SOL** in the signing wallet for all Gemetra sends.
+- **SPL transfers** (e.g. **USDT**) include the same base fee plus slightly more work than a simple SOL transfer; still usually very small in USD terms.
+- You cannot pay BOT Chain protocol fees in **USDT**; keep **SOL** in the signing wallet for all Gemetra sends.
 
 Gemetra does not quote an exact fee ahead of time in the assistant — your wallet shows the final fee before you approve.`;
   }
@@ -839,20 +839,20 @@ Gemetra does not quote an exact fee ahead of time in the assistant — your wall
   if (/payment methods?.*support|supported.*(payment|payout|currency|token)|what payment (options|methods)/i.test(m)) {
     return `### Payment methods supported in Gemetra
 
-Settlements are **on-chain on Solana** from your connected wallet:
+Settlements are **on-chain on BOT Chain** from your connected wallet:
 
-- **PUSD** (Palm USD) — SPL stablecoin, default for dollar-style amounts.
+- **USDT** (Palm USD) — SPL stablecoin, default for dollar-style amounts.
 - **Native SOL** — optional payout asset where the UI offers a **token** toggle.
 
-There is no card / bank rail inside the app; fiat would be off-ramped outside this product. VAT and payroll UIs let you choose **PUSD** or **SOL** per flow or per schedule.`;
+There is no card / bank rail inside the app; fiat would be off-ramped outside this product. VAT and payroll UIs let you choose **USDT** or **SOL** per flow or per schedule.`;
   }
 
   if (/how (do|can) i make a payment|how to pay (an |my )?employee|process (a |the )?payroll/i.test(m)) {
     return `### How to make a payment
 
-1. **Connect** your Solana wallet.
+1. **Connect** your BOT Chain wallet.
 2. **Employees:** add or import people (CSV) under **Employees** if needed.
-3. Open **Bulk transfer** (or single payment flows where available), select recipients and amounts, and choose **PUSD** or **SOL**.
+3. Open **Bulk transfer** (or single payment flows where available), select recipients and amounts, and choose **USDT** or **SOL**.
 4. Review the **preview** modal, then **confirm** and **sign** in your wallet.
 5. Wait for confirmation; the app records **status** and **transaction signature** when complete.
 
@@ -868,9 +868,9 @@ For future-dated runs, use **Scheduled payments** instead.`;
 
 In Gemetra, a **bulk payment** is a **batch payroll send** from the **Bulk transfer** screen:
 
-- You pick **one or many employees**, amounts, and the **token** (**PUSD** or **SOL**).
-- The app shows a **preview** with totals, then asks your **Solana wallet** to **sign** (often one transaction per recipient, depending on how the flow is built).
-- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **Solana mainnet‑beta**.
+- You pick **one or many employees**, amounts, and the **token** (**USDT** or **SOL**).
+- The app shows a **preview** with totals, then asks your **BOT Chain wallet** to **sign** (often one transaction per recipient, depending on how the flow is built).
+- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **BOT Chain mainnet‑beta**.
 
 It’s the opposite of paying people one-by-one manually off-platform: everything stays **in-app**, **wallet-signed**, and tied to your employee list.`;
   }
@@ -985,7 +985,7 @@ ${lines}`;
     const completed = context.payments.filter((p) => p.status === "completed");
     const byToken: Record<string, number> = {};
     for (const p of completed) {
-      const t = String(p.token || "PUSD").toUpperCase();
+      const t = String(p.token || "USDT").toUpperCase();
       byToken[t] = (byToken[t] || 0) + (Number(p.amount) || 0);
     }
     const lines = Object.entries(byToken)
@@ -998,7 +998,7 @@ ${lines}`;
 
 ${lines || "_(no completed payments in this session yet)_"}
 
-_Note: PUSD rows are stored as dollar-style numbers; SOL rows are in SOL. Pending or failed rows are excluded._`;
+_Note: USDT rows are stored as dollar-style numbers; SOL rows are in SOL. Pending or failed rows are excluded._`;
   }
 
   if (/employee statistics|workforce stats|stats.*employees/i.test(m)) {
@@ -1039,7 +1039,7 @@ ${deptLines}`;
       .map((p) => {
         const who = employeeDisplayName(context, p);
         const when = (p.payment_date || p.created_at || "").toString().slice(0, 19).replace("T", " ");
-        const tok = p.token || "PUSD";
+        const tok = p.token || "USDT";
         const link = p.transaction_hash
           ? `[Solscan](${solanaTxExplorerUrl(p.transaction_hash)})`
           : "—";
@@ -1072,9 +1072,9 @@ const handleCompanyIntelligence = (message: string, context: AIContext): string 
   // Basic conversational responses
   if (/(thank you|thanks|thx|appreciate|great|awesome|perfect|excellent)/i.test(message) && message.length < 50) {
     const responses = [
-      "You're welcome! Need anything else on payroll/VAT workflows, Solana, or Palm USD?",
-      "Glad it helped — ask anytime about employee data, treasury ops, Solana/PUSD payouts, or wallet setup.",
-      "My pleasure — I can revisit company metrics or explain how payouts flow on Solana with PUSD.",
+      "You're welcome! Need anything else on payroll/VAT workflows, BOT Chain, or Palm USD?",
+      "Glad it helped — ask anytime about employee data, treasury ops, BOT Chain/USDT payouts, or wallet setup.",
+      "My pleasure — I can revisit company metrics or explain how payouts flow on BOT Chain with USDT.",
       "You're welcome! I'm always ready to dive into your company data or provide market analysis."
     ];
     return responses[Math.floor(Math.random() * responses.length)];
@@ -1082,7 +1082,7 @@ const handleCompanyIntelligence = (message: string, context: AIContext): string 
   
   // Simple greetings
   if (/(^hi$|^hello$|^hey$|good morning|good afternoon|good evening)/i.test(message.trim())) {
-    return "Hello! I'm your Gemetra assistant — **Solana** settlements (**PUSD** or **SOL**), wallet-adapter sign-in, VAT/payroll flows, plus your synced employee roster. What's the first priority?";
+    return "Hello! I'm your Gemetra assistant — **BOT Chain** settlements (**USDT** or **SOL**), wallet-adapter sign-in, VAT/payroll flows, plus your synced employee roster. What's the first priority?";
   }
   
   // Salary overview questions - catch various forms including "Employee salary breakdown"
@@ -1127,7 +1127,7 @@ ${Object.entries(analytics.departmentBreakdown)
 
 ${analytics.companyDescription}
 
-We currently have ${analytics.totalEmployees} employees logged and ${analytics.completedPayments} completed disbursements routed through Solana‑native flows with PUSD.`;
+We currently have ${analytics.totalEmployees} employees logged and ${analytics.completedPayments} completed disbursements routed through BOT Chain‑native flows with USDT.`;
   }
   
   // Company overview - catch "company overview please" - CHECK THIS FIRST before other overview checks
@@ -1149,7 +1149,7 @@ ${analytics.companyDescription}
 ## 🚀 **Key Services:**
 
 - Blockchain-based payroll processing
-- Solana Wallet Adapter + employee payouts in **PUSD** (or **SOL** when chosen)
+- BOT Chain Wallet Adapter + employee payouts in **USDT** (or **SOL** when chosen)
 - Secure & transparent salary distribution
 - Real-time payment tracking
 - Crypto payroll solutions
@@ -1176,7 +1176,7 @@ ${analytics.companyDescription}
 ## Key Services:
 
 - Blockchain-based payroll processing
-- Solana Wallet Adapter + employee payouts in **PUSD** (or **SOL** when chosen)
+- BOT Chain Wallet Adapter + employee payouts in **USDT** (or **SOL** when chosen)
 - Secure & transparent salary distribution
 - Real-time payment tracking
 - Crypto payroll solutions
@@ -1315,7 +1315,7 @@ ${Object.entries(analytics.departmentBreakdown)
     
     return `💳 **Last Payment Information:**
 
-• **Amount:** $${analytics.lastPayment.amount?.toLocaleString()} ${analytics.lastPayment.token || "PUSD"}
+• **Amount:** $${analytics.lastPayment.amount?.toLocaleString()} ${analytics.lastPayment.token || "USDT"}
 • **Employee:** ${analytics.lastPayment.employee_name || 'N/A'}
 • **Date:** ${paymentDate.toLocaleDateString()} at ${paymentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 • **Time Ago:** ${timeAgo}

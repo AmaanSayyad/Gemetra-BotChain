@@ -71,7 +71,7 @@ export const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
     if (!formData.wallet_address.trim()) {
       newErrors.wallet_address = 'Wallet address is required';
     } else if (!isValidSolanaAddress(formData.wallet_address.trim())) {
-      newErrors.wallet_address = 'Invalid Solana wallet address format';
+      newErrors.wallet_address = 'Invalid BOT Chain wallet address format';
     }
     if (!formData.salary || parseFloat(formData.salary) <= 0) newErrors.salary = 'Valid salary is required';
 

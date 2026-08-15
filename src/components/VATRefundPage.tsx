@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { Upload, FileCheck, QrCode, CheckCircle, AlertCircle, Search, Clock, FileText, FileUp, FormInput, ExternalLink } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { getConnectedAccount, sendPayment, isValidSolanaAddress, PUSD_SOLANA_MINT, type PaymentToken } from '../utils/ethereum';
-import {
-  buildSolanaPayUrl,
-  buildSplTokenSolanaPayUrl,
-  buildPhantomBrowsePaymentQrUrl,
-  isSolanaMobilePaymentQr,
-} from '../utils/solanaPayTransferUrl';
+import { getConnectedAccount, sendPayment, isValidEthereumAddress, recordVatRefundOnChain, type PaymentToken } from '../utils/ethereum';
+import { buildPaymentQrUrl } from '../utils/solanaPayTransferUrl';
 import { usePayments } from '../hooks/usePayments';
 import { usePoints } from '../hooks/usePoints';
 import { supabase } from '../lib/supabase';
@@ -18,11 +13,11 @@ interface VATRefundPageProps {
 }
 
 function vatHistoryTokenLogo(token?: string): { src: string; alt: string } {
-  const upper = (token || 'PUSD').toUpperCase();
-  if (upper === 'SOL') {
-    return { src: '/solana-sol-logo.png', alt: 'SOL' };
+  const upper = (token || 'USDT').toUpperCase();
+  if (upper === 'BOT' || upper === 'SOL') {
+    return { src: '/bot-token.svg', alt: 'BOT' };
   }
-  return { src: '/pusd.svg', alt: 'PUSD' };
+  return { src: '/usdt.png', alt: 'USDT' };
 }
 
 export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
@@ -36,7 +31,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
   const [qrValue, setQrValue] = useState<string>('');
   const [refundAmount, setRefundAmount] = useState<number>(0);
   const [entryMode, setEntryMode] = useState<'upload' | 'manual'>('upload');
-  const [selectedToken, setSelectedToken] = useState<PaymentToken>('PUSD');
+  const [selectedToken, setSelectedToken] = useState<PaymentToken>('USDT');
   const [transactionStatus, setTransactionStatus] = useState<'waiting' | 'confirmed' | 'rejected'>('waiting');
   const [transactionHash, setTransactionHash] = useState<string>('');
   const [refundHistory, setRefundHistory] = useState<any[]>([]);
@@ -112,8 +107,8 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
     }
 
     // Validate wallet address format (Solana address)
-    if (!isValidSolanaAddress(formData.receiverWalletAddress)) {
-      setErrorMessage('Please enter a valid Solana wallet address');
+    if (!isValidEthereumAddress(formData.receiverWalletAddress)) {
+      setErrorMessage('Please enter a valid BOT Chain wallet address');
       return;
     }
 
@@ -141,7 +136,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
     try {
       if (!getConnectedAccount()) {
         throw new Error(
-          "Solana wallet not connected. Connect Phantom (or another Solana wallet) to approve this refund.",
+          "Wallet not connected. Connect MetaMask or BO Wallet on BOT Chain to approve this refund.",
         );
       }
 
@@ -220,28 +215,13 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
 
       setStep("sign");
 
-      // Phantom universal link → in-app browser loads our HTTPS page → redirects to `solana:…` (avoids Coinbase catching raw `solana:` on iOS).
-      const solanaPay = selectedToken === 'PUSD'
-        ? buildSplTokenSolanaPayUrl({
-            recipientBase58: recipientAddress.trim(),
-            splMintBase58: PUSD_SOLANA_MINT,
-            amountUi: parseFloat(amount),
-            label: 'Gemetra VAT',
-            message: 'PUSD VAT refund payment',
-          })
-        : buildSolanaPayUrl({
-            recipientBase58: recipientAddress.trim(),
-            amountUi: parseFloat(amount),
-            label: 'Gemetra VAT',
-            message: 'SOL VAT refund payment',
-          });
-      // Phone must load this origin; use VITE_APP_PUBLIC_URL (e.g. ngrok HTTPS) when scanning from a device while dev server is on your laptop.
-      const envOrigin = (import.meta.env.VITE_APP_PUBLIC_URL as string | undefined)?.trim();
-      const appOrigin = (envOrigin && envOrigin.replace(/\/$/, '')) ||
-        (typeof globalThis !== 'undefined' && (globalThis as unknown as Window).location?.origin
-          ? (globalThis as unknown as Window).location.origin
-          : 'https://gemetra.local');
-      const qrData = buildPhantomBrowsePaymentQrUrl(solanaPay, appOrigin);
+      const qrData = buildPaymentQrUrl({
+        recipient: recipientAddress.trim(),
+        amountUi: parseFloat(amount),
+        token: selectedToken,
+        label: 'Gemetra VAT',
+        message: `${selectedToken} VAT refund payment`,
+      });
       setQrValue(qrData);
 
       // Send selected-token transaction
@@ -254,6 +234,14 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
       const tx = result.txHash;
 
       console.log("Transaction sent:", tx);
+
+      await recordVatRefundOnChain({
+        claimId: pendingRefundId || crypto.randomUUID(),
+        recipient: recipientAddress,
+        amount: refundAmount,
+        token: selectedToken,
+        receiptRef: formData.receiptNo || selectedFile?.name || "vat-refund",
+      });
 
         // Update pending refund record to completed, or create new one if pending wasn't created
         try {
@@ -384,7 +372,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
         ? formData.receiverWalletAddress 
         : (getConnectedAccount() || '');
 
-      if (!recipientAddress || !isValidSolanaAddress(recipientAddress)) {
+      if (!recipientAddress || !isValidEthereumAddress(recipientAddress)) {
         throw new Error('Valid recipient wallet address is required');
       }
 
@@ -570,8 +558,8 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
     }
 
     // Validate wallet address format (Solana address)
-    if (!isValidSolanaAddress(formData.receiverWalletAddress)) {
-      setErrorMessage('Please enter a valid Solana wallet address');
+    if (!isValidEthereumAddress(formData.receiverWalletAddress)) {
+      setErrorMessage('Please enter a valid BOT Chain wallet address');
       return;
     }
 
@@ -606,8 +594,8 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3 mb-2">
                 <img
-                  src="/pusd.svg"
-                  alt="PUSD logo"
+                  src="/usdt.png"
+                  alt="USDT logo"
                   className="h-6 w-6 object-contain"
                 />
                 <h2 className="text-xl font-bold text-gray-900">Submit VAT Refund</h2>
@@ -676,7 +664,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                         value={formData.receiverWalletAddress}
                         onChange={handleInputChange}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g. 7vHx5jN9y9pk1Nqk8xN8Nm4z3jc4hQqYr8M6Q61J6Y8R"
+                        placeholder="e.g. 0x1234...abcd"
                         required
                       />
                     </div>
@@ -686,19 +674,19 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          onClick={() => setSelectedToken('PUSD')}
-                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'PUSD' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                          onClick={() => setSelectedToken('USDT')}
+                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'USDT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/pusd.svg" alt="PUSD" className="h-4 w-4 object-contain" />
-                          <span>PUSD</span>
+                          <img src="/usdt.png" alt="USDT" className="h-4 w-4 object-contain" />
+                          <span>USDT</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => setSelectedToken('SOL')}
-                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'SOL' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                          onClick={() => setSelectedToken('BOT')}
+                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/solana-sol-logo.png" alt="SOL" className="h-4 w-4 object-contain" />
-                          <span>SOL</span>
+                          <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                          <span>BOT</span>
                         </button>
                       </div>
                     </div>
@@ -796,7 +784,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                         value={formData.receiverWalletAddress}
                         onChange={handleInputChange}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g. 7vHx5jN9y9pk1Nqk8xN8Nm4z3jc4hQqYr8M6Q61J6Y8R"
+                        placeholder="e.g. 0x1234...abcd"
                         required
                       />
                     </div>
@@ -807,19 +795,19 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          onClick={() => setSelectedToken('PUSD')}
-                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'PUSD' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                          onClick={() => setSelectedToken('USDT')}
+                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'USDT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/pusd.svg" alt="PUSD" className="h-4 w-4 object-contain" />
-                          <span>PUSD</span>
+                          <img src="/usdt.png" alt="USDT" className="h-4 w-4 object-contain" />
+                          <span>USDT</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => setSelectedToken('SOL')}
-                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'SOL' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                          onClick={() => setSelectedToken('BOT')}
+                          className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/solana-sol-logo.png" alt="SOL" className="h-4 w-4 object-contain" />
-                          <span>SOL</span>
+                          <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                          <span>BOT</span>
                         </button>
                       </div>
                   </div>
@@ -940,8 +928,8 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <img
-                src="/pusd.svg"
-                alt="PUSD logo"
+                src="/usdt.png"
+                alt="USDT logo"
                 className="h-6 w-6 object-contain"
               />
               <h2 className="text-xl font-bold text-gray-900">Review VAT Refund Details</h2>
@@ -1100,27 +1088,27 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <img
-                src="/pusd.svg"
-                alt="PUSD logo"
+                src="/usdt.png"
+                alt="USDT logo"
                 className="h-6 w-6 object-contain"
               />
-              <h2 className="text-xl font-bold text-gray-900">Sign with Solana Wallet</h2>
+              <h2 className="text-xl font-bold text-gray-900">Sign with BOT Chain Wallet</h2>
             </div>
 
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 flex flex-col items-center justify-center mb-6">
               {transactionStatus === 'waiting' ? (
                 <>
                   <QrCode className="w-16 h-16 text-blue-500 mb-4" />
-                  <h3 className="font-semibold text-gray-900 mb-2">Check Your Solana Mobile Wallet</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">Check Your Wallet</h3>
                   <p className="text-gray-600 text-center mb-2">
-                    A transaction popup should appear in your Solana mobile wallet app
+                    A transaction popup should appear in MetaMask or BO Wallet
                   </p>
                   <p className="text-gray-500 text-center text-sm mb-6">
-                    Scan with your iPhone Camera — it should open Phantom for this Solana Pay transfer (recommended).
+                    Scan the QR with your wallet app for this BOT Chain transfer (recommended).
                   </p>
 
                   <div className="bg-white border-2 border-gray-300 rounded-lg p-6 w-[280px] h-[280px] flex items-center justify-center mb-4 shadow-lg">
-                    {qrValue && isSolanaMobilePaymentQr(qrValue) ? (
+                    {qrValue ? (
                       <div className="flex flex-col items-center">
                         <QRCodeSVG
                           value={qrValue}
@@ -1154,7 +1142,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-blue-700">Network Fee:</span>
-                        <span className="text-sm font-medium text-blue-900">~0.000005 SOL</span>
+                        <span className="text-sm font-medium text-blue-900">~0.00002 BOT</span>
                       </div>
                     </div>
                   </div>
@@ -1172,14 +1160,14 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       <div className="mb-4">
                         <div className="flex items-center justify-center gap-2 mb-3">
                           <img
-                            src="/pusd.svg"
-                            alt="PUSD logo"
+                            src="/usdt.png"
+                            alt="USDT logo"
                             className="h-5 w-5 object-contain"
                           />
                           <h3 className="text-2xl font-bold text-gray-900">Transaction Confirmed!</h3>
                         </div>
                         <p className="text-gray-600 text-base">
-                          Your transaction has been confirmed on Solana
+                          Your transaction has been confirmed on BOT Chain
                         </p>
                       </div>
                       <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 mb-6 shadow-sm">
@@ -1187,7 +1175,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                           <span className="text-green-800 font-medium text-sm">Transaction Hash:</span>
                           {transactionHash ? (
                             <a
-                              href={`https://solscan.io/tx/${transactionHash}`}
+                              href={`https://scan.botchain.ai/tx/${transactionHash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-green-900 font-mono text-sm flex items-center justify-center sm:justify-end gap-2 hover:text-blue-600 hover:underline bg-white/60 px-3 py-1.5 rounded-lg transition-all"
@@ -1205,11 +1193,11 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <div className="flex items-center justify-center gap-2 text-sm text-blue-800">
                           <img
-                              src="/solana-sol-logo.png"
-                            alt="Solana"
+                              src="/bot-token.svg"
+                            alt="BOT Chain"
                             className="h-4 w-4 object-contain"
                           />
-                          <span>Secured by Solana • Powered by PUSD</span>
+                          <span>Secured by BOT Chain • Powered by USDT</span>
                         </div>
                       </div>
                     </>
@@ -1276,14 +1264,14 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
               </div>
               <div className="flex items-center justify-center gap-3 mb-3">
                 <img
-                  src="/pusd.svg"
-                  alt="PUSD logo"
+                  src="/usdt.png"
+                  alt="USDT logo"
                   className="h-7 w-7 object-contain"
                 />
                 <h2 className="text-2xl font-bold text-gray-900">VAT Refund Submitted Successfully</h2>
               </div>
               <p className="text-gray-600 text-base max-w-md mx-auto">
-                Your VAT refund request has been successfully submitted and is being processed on Solana
+                Your VAT refund request has been successfully submitted and is being processed on BOT Chain
               </p>
             </div>
 
@@ -1325,7 +1313,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                   <span className="text-gray-700 font-medium">Refund Amount:</span>
                   <div className="flex items-center gap-2">
                     <img
-                      src="/pusd.svg"
+                      src="/usdt.png"
                       alt="PUSD"
                       className="h-5 w-5 object-contain"
                     />
@@ -1340,7 +1328,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-300 pb-3">
                     <span className="text-gray-700 font-medium">Transaction Hash:</span>
                     <a
-                      href={`https://solscan.io/tx/${transactionHash}`}
+                      href={`https://scan.botchain.ai/tx/${transactionHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 font-mono text-sm flex items-center gap-2 hover:text-blue-800 hover:underline bg-white px-3 py-1.5 rounded-lg border border-blue-200 transition-all"
@@ -1409,8 +1397,8 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div className="flex items-center gap-3">
             <img
-              src="/pusd.svg"
-              alt="PUSD logo"
+              src="/usdt.png"
+              alt="USDT logo"
               className="h-7 w-7 object-contain"
             />
             <h2 className="text-2xl font-bold text-gray-900">VAT Refund History</h2>
@@ -1437,7 +1425,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">No VAT refund history found</h3>
             <p className="text-gray-500 text-sm max-w-md mx-auto">
-              Submit a VAT refund to see it appear in your history. All refunds are processed on Solana using PUSD or SOL.
+              Submit a VAT refund to see it appear in your history. All refunds are processed on BOT Chain using USDT or BOT.
             </p>
           </div>
         ) : (
@@ -1519,7 +1507,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                               alt={rowTokenLogo.alt}
                               className="h-3.5 w-3.5 object-contain"
                             />
-                            {refund.token || 'PUSD'}
+                            {refund.token || 'USDT'}
                           </div>
                         </td>
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
@@ -1538,7 +1526,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                           {refund.transaction_hash ? (
                             <a
-                              href={`https://solscan.io/tx/${refund.transaction_hash}`}
+                              href={`https://scan.botchain.ai/tx/${refund.transaction_hash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-mono text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 transition-all hover:shadow-sm"

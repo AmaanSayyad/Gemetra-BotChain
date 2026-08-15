@@ -1,9 +1,61 @@
-import { encodeURL } from "@solana/pay";
+import { parseUnits } from "viem";
+import { BOTCHAIN_USDT_ADDRESS, BOTCHAIN_USDT_DECIMALS } from "../config/botchain";
+import { normalizePaymentToken, type PaymentToken } from "./ethereum";
 
-/**
- * Build a Solana Pay *transfer request* URL (Phantom, Solflare, etc.).
- * Prefer this over concatenating strings — malformed URLs trigger wrong chains in some scanners.
- */
+/** EIP-681 payment URI for native BOT. */
+export function buildNativePayUrl(opts: {
+  recipient: string;
+  amountUi: number;
+  label?: string;
+  message?: string;
+}): string {
+  const value = parseUnits(opts.amountUi.toFixed(18), 18).toString();
+  const params = new URLSearchParams({ value });
+  if (opts.label) params.set("label", opts.label);
+  if (opts.message) params.set("message", opts.message);
+  return `ethereum:${opts.recipient}@677?${params.toString()}`;
+}
+
+/** EIP-681 ERC-20 transfer URI for BOT Chain USDT. */
+export function buildUsdtPayUrl(opts: {
+  recipient: string;
+  amountUi: number;
+  label?: string;
+  message?: string;
+}): string {
+  const amount = parseUnits(opts.amountUi.toFixed(BOTCHAIN_USDT_DECIMALS), BOTCHAIN_USDT_DECIMALS).toString();
+  const params = new URLSearchParams({
+    address: opts.recipient,
+    uint256: amount,
+  });
+  if (opts.label) params.set("label", opts.label);
+  if (opts.message) params.set("message", opts.message);
+  return `ethereum:${BOTCHAIN_USDT_ADDRESS}@677/transfer?${params.toString()}`;
+}
+
+export function buildPaymentQrUrl(opts: {
+  recipient: string;
+  amountUi: number;
+  token?: PaymentToken | string;
+  label?: string;
+  message?: string;
+}): string {
+  return normalizePaymentToken(opts.token) === "BOT"
+    ? buildNativePayUrl({
+        recipient: opts.recipient,
+        amountUi: opts.amountUi,
+        label: opts.label,
+        message: opts.message,
+      })
+    : buildUsdtPayUrl({
+        recipient: opts.recipient,
+        amountUi: opts.amountUi,
+        label: opts.label,
+        message: opts.message,
+      });
+}
+
+/** @deprecated Use buildUsdtPayUrl */
 export function buildSplTokenSolanaPayUrl(opts: {
   recipientBase58: string;
   splMintBase58: string;
@@ -11,50 +63,33 @@ export function buildSplTokenSolanaPayUrl(opts: {
   label?: string;
   message?: string;
 }): string {
-  return encodeURL({
+  return buildUsdtPayUrl({
     recipient: opts.recipientBase58,
-    amount: opts.amountUi,
-    splToken: opts.splMintBase58,
+    amountUi: opts.amountUi,
     label: opts.label,
     message: opts.message,
-  }).toString();
+  });
 }
 
+/** @deprecated Use buildNativePayUrl */
 export function buildSolanaPayUrl(opts: {
   recipientBase58: string;
   amountUi: number;
   label?: string;
   message?: string;
 }): string {
-  return encodeURL({
+  return buildNativePayUrl({
     recipient: opts.recipientBase58,
-    amount: opts.amountUi,
+    amountUi: opts.amountUi,
     label: opts.label,
     message: opts.message,
-  }).toString();
+  });
 }
 
-const PHANTOM_BROWSE_UL = "https://phantom.app/ul/browse/";
-
-/**
- * QR value that opens Phantom on iOS (via universal link), then our HTTPS page redirects to the real `solana:…` payment.
- * Raw `solana:` QRs are often handled by Coinbase Wallet; Phantom’s browse flow expects an https URL.
- * @see https://docs.phantom.com/phantom-deeplinks/other-methods/browse
- */
-export function buildPhantomBrowsePaymentQrUrl(
-  solanaPayUrl: string,
-  appOrigin: string,
-): string {
-  const origin = appOrigin.replace(/\/$/, "");
-  const inner = `${origin}/vat-solana-pay-redirect.html#${encodeURIComponent(solanaPayUrl)}`;
-  const ref = `${origin}/`;
-  return `${PHANTOM_BROWSE_UL}${encodeURIComponent(inner)}?ref=${encodeURIComponent(ref)}`;
+export function buildPhantomBrowsePaymentQrUrl(payUrl: string, _appOrigin: string): string {
+  return payUrl;
 }
 
-/** True if the QR encodes Solana Pay or Phantom’s browse wrapper for it (safe to render as payment QR). */
 export function isSolanaMobilePaymentQr(value: string): boolean {
-  return (
-    value.startsWith("solana:") ||
-    value.startsWith(PHANTOM_BROWSE_UL)
-  );
+  return value.startsWith("ethereum:") || value.startsWith("botchain:");
 }

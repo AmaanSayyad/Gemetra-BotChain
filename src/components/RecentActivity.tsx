@@ -128,8 +128,8 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div className="flex items-center gap-2">
           <img
-            src="/pusd.svg"
-            alt="PUSD logo"
+            src="/usdt.png"
+            alt="USDT logo"
             className="h-5 w-5 object-contain"
           />
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recent Activity</h3>
@@ -167,7 +167,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                 {activity.transactionHash && (
                   <div className="mb-2">
                     <a
-                      href={`https://solscan.io/tx/${activity.transactionHash}`}
+                      href={`https://scan.botchain.ai/tx/${activity.transactionHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()} // Prevent triggering parent click

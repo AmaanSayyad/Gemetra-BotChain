@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+.deployer.json
+deployments/local.json
+*.log
+.DS_Store
+.vercel
+.supabase
+cache
+out
+artifacts
+typechain-types

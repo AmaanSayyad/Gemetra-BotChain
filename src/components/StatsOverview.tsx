@@ -131,8 +131,8 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({ companyName, emplo
         <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
             <img
-              src="/pusd.svg"
-              alt="PUSD logo"
+              src="/usdt.png"
+              alt="USDT logo"
               className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
             />
           </div>

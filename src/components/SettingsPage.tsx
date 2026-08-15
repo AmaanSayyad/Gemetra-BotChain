@@ -147,7 +147,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
           exportedBy: address,
           walletAddress: address,
           dataVersion: '1.0',
-          network: chainId === 101 ? 'Solana Mainnet' : `Cluster ${chainId}`
+          network: chainId === 677 ? 'BOT Chain Mainnet' : `Chain ${chainId}`
         },
         companyInfo: {
           companyName: companyName,
@@ -401,9 +401,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                   <div className="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2">
                     <Globe className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-900 text-sm sm:text-base">
-                      {chainId === 101 ? 'Solana Mainnet' : `Cluster ${chainId}`}
+                      {chainId === 677 ? 'BOT Chain Mainnet' : `Chain ${chainId}`}
                     </span>
-                    {chainId === 101 && (
+                    {chainId === 677 && (
                       <span className="ml-auto px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">
                         Production
                       </span>
@@ -452,7 +452,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-600 text-xs sm:text-sm">Network</span>
                       <span className="text-gray-900 text-xs sm:text-sm font-medium">
-                        {chainId === 101 ? 'Mainnet-beta' : `Cluster ${chainId}`}
+                        {chainId === 677 ? 'BOT Chain' : `Chain ${chainId}`}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">

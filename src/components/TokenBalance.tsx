@@ -14,7 +14,7 @@ export const TokenBalance: React.FC = () => {
   const { address: connectedFromHook } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState('');
-  /** Live SOL spot in USD (CoinGecko), null if unavailable */
+  /** Live BOT spot in USD (CoinGecko), null if unavailable */
   const [solUsdSpot, setSolUsdSpot] = useState<number | null>(null);
   const [balances, setBalances] = useState({
     totalUSD: 0,
@@ -35,7 +35,7 @@ export const TokenBalance: React.FC = () => {
 
         const [accountBalance, solMarket] = await Promise.all([
           getAccountBalance(connectedAddress),
-          fetchCryptoPrice('solana'),
+          fetchCryptoPrice('bot-token').catch(() => fetchCryptoPrice('solana')),
         ]);
 
         const solUsd =
@@ -225,12 +225,12 @@ export const TokenBalance: React.FC = () => {
               <div className="text-gray-600 text-xs sm:text-sm">Total Balance (USD)</div>
               {balances.eth > 0 && solUsdSpot == null && (
                 <div className="text-[11px] text-amber-700 mt-1 max-w-xs mx-auto">
-                  SOL/USD unavailable; total reflects stables only until a live price loads (try refresh).
+                  BOT/USD unavailable; total reflects stables only until a live price loads (try refresh).
                 </div>
               )}
               {solUsdSpot != null && (
                 <div className="text-[11px] text-gray-400 mt-1">
-                  SOL ≈ ${solUsdSpot.toFixed(2)} (CoinGecko spot)
+                  BOT ≈ ${solUsdSpot.toFixed(2)} (CoinGecko spot)
                 </div>
               )}
             </div>
@@ -245,27 +245,27 @@ export const TokenBalance: React.FC = () => {
 
           {/* Token List */}
           <div className="space-y-1 mb-4 sm:mb-6">
-            {/* SOL Balance */}
+            {/* BOT Balance */}
             {balances.eth > 0 && (
               <TokenRow
-                symbol="SOL"
+                symbol="BOT"
                 amount={balances.eth}
                 usdValue={solUsdSpot != null ? balances.eth * solUsdSpot : 0}
                 usdUnavailable={solUsdSpot == null}
               />
             )}
 
-            {/* PUSD Balance */}
+            {/* USDT used as payroll stable (legacy field name pusd) */}
             {balances.pusd > 0 && (
               <TokenRow
-                symbol="PUSD"
+                symbol="USDT"
                 amount={balances.pusd}
                 usdValue={balances.pusd * 1}
               />
             )}
 
-            {/* USDT (Solana SPL) */}
-            {balances.usdt > 0 && (
+            {/* USDT (BOT Chain ERC-20) */}
+            {balances.usdt > 0 && balances.pusd === 0 && (
               <TokenRow
                 symbol="USDT"
                 amount={balances.usdt}
@@ -299,7 +299,7 @@ export const TokenBalance: React.FC = () => {
               {balances.totalUSD > 0 
                 ? `Your portfolio holds ${balances.totalCoins} asset${balances.totalCoins !== 1 ? 's' : ''} worth $${balances.totalUSD.toFixed(2)}`
                 : isWalletConnected() 
-                ? 'Consider adding SOL, PUSD, or USDT to your wallet'
+                ? 'Consider adding BOT or USDT to your wallet'
                 : 'Connect your wallet to see real-time balance insights'
               }
             </div>

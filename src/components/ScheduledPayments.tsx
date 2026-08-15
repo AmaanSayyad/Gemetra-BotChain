@@ -12,14 +12,15 @@ import type { PaymentToken } from '../utils/ethereum';
 
 type PreApprovalLimitsState = Record<PaymentToken, number | null>;
 
-const emptyPreApprovalLimits = (): PreApprovalLimitsState => ({ PUSD: null, SOL: null });
+const emptyPreApprovalLimits = (): PreApprovalLimitsState => ({ USDT: null, BOT: null });
 
 function normalizeScheduledToken(token: string | undefined): PaymentToken {
-  return token?.toUpperCase() === 'SOL' ? 'SOL' : 'PUSD';
+  const t = token?.toUpperCase();
+  return t === 'BOT' || t === 'SOL' ? 'BOT' : 'USDT';
 }
 
 function sumDueAmountsByToken(due: ScheduledPayment[]): Record<PaymentToken, number> {
-  const sums: Record<PaymentToken, number> = { PUSD: 0, SOL: 0 };
+  const sums: Record<PaymentToken, number> = { USDT: 0, BOT: 0 };
   for (const p of due) {
     sums[normalizeScheduledToken(p.token)] += p.amount;
   }
@@ -30,7 +31,7 @@ function sumDueAmountsByToken(due: ScheduledPayment[]): Record<PaymentToken, num
 function dueFitsPreapprovalLimits(due: ScheduledPayment[], limits: PreApprovalLimitsState): boolean {
   if (due.length === 0) return false;
   const sums = sumDueAmountsByToken(due);
-  for (const token of ['PUSD', 'SOL'] as const) {
+  for (const token of ['USDT', 'BOT'] as const) {
     if (sums[token] <= 0) continue;
     const lim = limits[token];
     if (lim == null || lim <= 0 || sums[token] > lim) return false;
@@ -39,7 +40,7 @@ function dueFitsPreapprovalLimits(due: ScheduledPayment[], limits: PreApprovalLi
 }
 
 function hasConfiguredPreapprovalLimit(limits: PreApprovalLimitsState): boolean {
-  return (limits.PUSD != null && limits.PUSD > 0) || (limits.SOL != null && limits.SOL > 0);
+  return (limits.USDT != null && limits.USDT > 0) || (limits.BOT != null && limits.BOT > 0);
 }
 
 function canAttemptAutoProcess(due: ScheduledPayment[], limits: PreApprovalLimitsState): boolean {
@@ -79,7 +80,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
   const [recurrence, setRecurrence] = useState<'daily' | 'weekly' | 'bi-weekly' | 'monthly'>('monthly');
   const [endDate, setEndDate] = useState('');
   const [amount, setAmount] = useState('');
-  const [selectedToken, setSelectedToken] = useState<PaymentToken>('PUSD');
+  const [selectedToken, setSelectedToken] = useState<PaymentToken>('USDT');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<{ success: number; failed: number } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
@@ -89,7 +90,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
   const [preApprovalAmount, setPreApprovalAmount] = useState('');
   const [preApprovalLimits, setPreApprovalLimits] = useState<PreApprovalLimitsState>(emptyPreApprovalLimits);
   /** Token row being edited in the pre-approve modal */
-  const [preApprovalToken, setPreApprovalToken] = useState<PaymentToken>('PUSD');
+  const [preApprovalToken, setPreApprovalToken] = useState<PaymentToken>('USDT');
 
   // Load per-token pre-approval limits (migrates legacy single PUSD key)
   useEffect(() => {
@@ -104,8 +105,12 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Record<PaymentToken, number | null>>;
         setPreApprovalLimits({
-          PUSD: parsed.PUSD != null && !Number.isNaN(Number(parsed.PUSD)) ? Number(parsed.PUSD) : null,
-          SOL: parsed.SOL != null && !Number.isNaN(Number(parsed.SOL)) ? Number(parsed.SOL) : null,
+          USDT: (parsed.USDT ?? (parsed as { PUSD?: number }).PUSD) != null && !Number.isNaN(Number(parsed.USDT ?? (parsed as { PUSD?: number }).PUSD))
+            ? Number(parsed.USDT ?? (parsed as { PUSD?: number }).PUSD)
+            : null,
+          BOT: (parsed.BOT ?? (parsed as { SOL?: number }).SOL) != null && !Number.isNaN(Number(parsed.BOT ?? (parsed as { SOL?: number }).SOL))
+            ? Number(parsed.BOT ?? (parsed as { SOL?: number }).SOL)
+            : null,
         });
         return;
       }
@@ -113,7 +118,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
       if (legacy) {
         const n = parseFloat(legacy);
         if (!Number.isNaN(n) && n > 0) {
-          const migrated: PreApprovalLimitsState = { PUSD: n, SOL: null };
+          const migrated: PreApprovalLimitsState = { USDT: n, BOT: null };
           setPreApprovalLimits(migrated);
           localStorage.setItem(newKey, JSON.stringify(migrated));
         } else {
@@ -146,7 +151,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
               updateScheduledPayment
             );
             console.log(`✅ Auto-processed ${result.processed} payments`);
-            const used: Record<PaymentToken, number> = { PUSD: 0, SOL: 0 };
+            const used: Record<PaymentToken, number> = { USDT: 0, BOT: 0 };
             duePayments.forEach((p, i) => {
               if (result.results[i]?.success) {
                 used[normalizeScheduledToken(p.token)] += p.amount;
@@ -154,8 +159,8 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
             });
             setPreApprovalLimits((prev) => {
               const next: PreApprovalLimitsState = {
-                PUSD: prev.PUSD != null ? Math.max(0, prev.PUSD - used.PUSD) : null,
-                SOL: prev.SOL != null ? Math.max(0, prev.SOL - used.SOL) : null,
+                USDT: prev.USDT != null ? Math.max(0, prev.USDT - used.USDT) : null,
+                BOT: prev.BOT != null ? Math.max(0, prev.BOT - used.BOT) : null,
               };
               localStorage.setItem(`gemetra_preapproval_limits_${walletAddress}`, JSON.stringify(next));
               return next;
@@ -230,7 +235,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
 
     // Show confirmation dialog with payment details
     const paymentList = duePayments
-      .map((p) => `  • ${p.employee_name}: ${p.amount.toLocaleString()} ${p.token || 'PUSD'}`)
+      .map((p) => `  • ${p.employee_name}: ${p.amount.toLocaleString()} ${p.token || 'USDT'}`)
       .join('\n');
     
     const confirmMessage = `You are about to process ${duePayments.length} payment${duePayments.length > 1 ? 's' : ''}:\n\n${paymentList}\n\n⚠️ Your wallet will open ${duePayments.length > 1 ? `${duePayments.length} popup${duePayments.length > 1 ? 's' : ''}` : 'a popup'} for confirmation. You'll need to approve each transaction.\n\nProceed?`;
@@ -399,16 +404,16 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                 <div>
                   <p className="text-purple-800 font-medium">
                     Pre-approved spending limits:{' '}
-                    {preApprovalLimits.PUSD != null && preApprovalLimits.PUSD > 0 && (
-                      <span className="whitespace-nowrap">${preApprovalLimits.PUSD.toLocaleString()} PUSD</span>
+                    {preApprovalLimits.USDT != null && preApprovalLimits.USDT > 0 && (
+                      <span className="whitespace-nowrap">${preApprovalLimits.USDT.toLocaleString()} USDT</span>
                     )}
-                    {preApprovalLimits.PUSD != null &&
-                      preApprovalLimits.PUSD > 0 &&
-                      preApprovalLimits.SOL != null &&
-                      preApprovalLimits.SOL > 0 &&
+                    {preApprovalLimits.USDT != null &&
+                      preApprovalLimits.USDT > 0 &&
+                      preApprovalLimits.BOT != null &&
+                      preApprovalLimits.BOT > 0 &&
                       ' · '}
-                    {preApprovalLimits.SOL != null && preApprovalLimits.SOL > 0 && (
-                      <span className="whitespace-nowrap">{preApprovalLimits.SOL.toLocaleString()} SOL</span>
+                    {preApprovalLimits.BOT != null && preApprovalLimits.BOT > 0 && (
+                      <span className="whitespace-nowrap">{preApprovalLimits.BOT.toLocaleString()} BOT</span>
                     )}
                   </p>
                   <p className="text-purple-700 text-sm mt-1">
@@ -453,15 +458,15 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
         {duePayments.length > 0 && (() => {
           const isWithinLimit = dueFitsPreapprovalLimits(duePayments, preApprovalLimits);
           const sums = sumDueAmountsByToken(duePayments);
-          const tokenLines = (['PUSD', 'SOL'] as const)
+          const tokenLines = (['USDT', 'BOT'] as const)
             .filter((t) => sums[t] > 0)
             .map((t) => {
               const lim = preApprovalLimits[t];
-              const unit = t === 'PUSD' ? 'PUSD' : 'SOL';
-              const dueStr = t === 'PUSD' ? `$${sums[t].toLocaleString()}` : `${sums[t].toLocaleString()} ${unit}`;
+              const unit = t === 'USDT' ? 'USDT' : 'BOT';
+              const dueStr = t === 'USDT' ? `$${sums[t].toLocaleString()}` : `${sums[t].toLocaleString()} ${unit}`;
               const limStr =
                 lim != null && lim > 0
-                  ? t === 'PUSD'
+                  ? t === 'USDT'
                     ? `$${lim.toLocaleString()}`
                     : `${lim.toLocaleString()} ${unit}`
                   : 'not set';
@@ -738,7 +743,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
               >
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Pre-approve Spending Limit</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Set a separate spending cap per token (PUSD and SOL). Auto-run only triggers when every due token&apos;s total is within its cap. <strong>Note:</strong> Wallet confirmation is still required for each transaction for security.
+                  Set a separate spending cap per token (USDT and BOT). Auto-run only triggers when every due token&apos;s total is within its cap. <strong>Note:</strong> Wallet confirmation is still required for each transaction for security.
                 </p>
 
                 <div className="mb-4">
@@ -746,27 +751,27 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <button
                       type="button"
-                      onClick={() => setPreApprovalToken('PUSD')}
+                      onClick={() => setPreApprovalToken('USDT')}
                       className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${
-                        preApprovalToken === 'PUSD'
+                        preApprovalToken === 'USDT'
                           ? 'bg-purple-600 text-white border-purple-600'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      <img src="/pusd.svg" alt="PUSD" className="h-4 w-4 object-contain" />
-                      <span>PUSD</span>
+                      <img src="/usdt.png" alt="USDT" className="h-4 w-4 object-contain" />
+                      <span>USDT</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPreApprovalToken('SOL')}
+                      onClick={() => setPreApprovalToken('BOT')}
                       className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${
-                        preApprovalToken === 'SOL'
+                        preApprovalToken === 'BOT'
                           ? 'bg-purple-600 text-white border-purple-600'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      <img src="/solana-sol-logo.png" alt="SOL" className="h-4 w-4 object-contain" />
-                      <span>SOL</span>
+                      <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                      <span>BOT</span>
                     </button>
                   </div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -776,15 +781,15 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                     type="number"
                     value={preApprovalAmount}
                     onChange={(e) => setPreApprovalAmount(e.target.value)}
-                    placeholder={preApprovalToken === 'PUSD' ? 'Enter amount (e.g., 1000)' : 'Enter SOL amount (e.g., 2.5)'}
+                    placeholder={preApprovalToken === 'USDT' ? 'Enter amount (e.g., 1000)' : 'Enter BOT amount (e.g., 2.5)'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                   {preApprovalLimits[preApprovalToken] != null && preApprovalLimits[preApprovalToken]! > 0 && (
                     <p className="text-xs text-gray-500 mt-1">
                       Current {preApprovalToken} limit:{' '}
-                      {preApprovalToken === 'PUSD'
-                        ? `$${preApprovalLimits.PUSD!.toLocaleString()}`
-                        : `${preApprovalLimits.SOL!.toLocaleString()} SOL`}
+                      {preApprovalToken === 'USDT'
+                        ? `$${preApprovalLimits.USDT!.toLocaleString()}`
+                        : `${preApprovalLimits.BOT!.toLocaleString()} BOT`}
                     </p>
                   )}
                 </div>
@@ -821,9 +826,9 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                       localStorage.setItem(`gemetra_preapproval_limits_${walletAddress}`, JSON.stringify(next));
 
                       const label =
-                        preApprovalToken === 'PUSD'
-                          ? `$${limit.toLocaleString()} PUSD`
-                          : `${limit.toLocaleString()} SOL`;
+                        preApprovalToken === 'USDT'
+                          ? `$${limit.toLocaleString()} USDT`
+                          : `${limit.toLocaleString()} BOT`;
                       alert(
                         `Pre-approval for ${preApprovalToken} set to ${label}. Other token limits are unchanged until you set them here.`,
                       );
@@ -906,19 +911,19 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setSelectedToken('PUSD')}
-                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'PUSD' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      onClick={() => setSelectedToken('USDT')}
+                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'USDT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
-                      <img src="/pusd.svg" alt="PUSD" className="h-4 w-4 object-contain" />
-                      <span>PUSD</span>
+                      <img src="/usdt.png" alt="USDT" className="h-4 w-4 object-contain" />
+                      <span>USDT</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setSelectedToken('SOL')}
-                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'SOL' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      onClick={() => setSelectedToken('BOT')}
+                      className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
-                      <img src="/solana-sol-logo.png" alt="SOL" className="h-4 w-4 object-contain" />
-                      <span>SOL</span>
+                      <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                      <span>BOT</span>
                     </button>
                   </div>
                 </div>

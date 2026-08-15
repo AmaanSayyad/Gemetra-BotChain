@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, Send, Users, DollarSign, Clock, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { sendBulkPayments, isWalletConnected, getConnectedAccount, formatAddress, PUSD_SOLANA_MINT, type PaymentToken } from '../utils/ethereum';
+import { sendBulkPayments, isWalletConnected, getConnectedAccount, formatAddress, BOTCHAIN_USDT, type PaymentToken } from '../utils/ethereum';
+import { explorerTxUrl, BOT_CHAIN_ID } from '../config/botchain';
 import { usePayments } from '../hooks/usePayments';
 import { usePoints } from '../hooks/usePoints';
 import { sendBulkPaymentEmails, PaymentEmailData } from '../utils/emailService';
@@ -51,8 +52,8 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
   if (!isOpen) return null;
 
   const totalAmount = employeesToPay.reduce((sum, emp) => sum + (emp.amount || 0), 0);
-  const networkFees = employeesToPay.length * 0.000005; // ~0.000005 SOL per transfer
-  const estimatedTime = employeesToPay.length * 3; // ~3 seconds per transfer (Solana)
+  const networkFees = employeesToPay.length * 0.00002; // ~0.00002 BOT per transfer
+  const estimatedTime = employeesToPay.length * 2; // ~2 seconds per transfer (BOT Chain)
 
   const walletConnected = isWalletConnected();
   const connectedAccount = getConnectedAccount();
@@ -275,7 +276,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
 
   const viewOnExplorer = () => {
     if (paymentResult?.txHash) {
-      window.open(`https://solscan.io/tx/${paymentResult.txHash}`, '_blank');
+      window.open(explorerTxUrl(paymentResult.txHash), '_blank');
     }
   };
 
@@ -299,7 +300,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
               <img
-                src={selectedToken === 'SOL' ? "/solana-sol-logo.png" : "/pusd.svg"}
+                src={selectedToken === 'BOT' ? "/bot-token.svg" : "/usdt.png"}
                 alt={`${selectedToken} logo`}
                 className="w-8 h-8 object-contain"
               />
@@ -331,30 +332,30 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
           ) : (
             <>
               {/* Network Warning */}
-              {chainId !== 101 && (
+              {chainId !== BOT_CHAIN_ID && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <AlertCircle className="w-5 h-5 text-red-600" />
                     <span className="text-red-800 font-medium">Wrong Network</span>
                   </div>
                   <p className="text-red-700 text-sm mt-1">
-                    Please switch to <strong>Solana Mainnet</strong> to use real {selectedToken} transfers.
+                    Please switch to <strong>BOT Chain Mainnet</strong> to use real {selectedToken} transfers.
                   </p>
                 </div>
               )}
 
               {/* Mainnet Confirmation */}
-              {chainId === 101 && (
+              {chainId === BOT_CHAIN_ID && (
                 <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-green-800 font-medium">Connected to Solana Mainnet</span>
+                    <span className="text-green-800 font-medium">Connected to BOT Chain Mainnet</span>
                   </div>
                   <p className="text-green-700 text-sm mt-1">
-                    {selectedToken === "PUSD" ? (
-                      <>Using real PUSD tokens. Mint: <code className="text-xs bg-green-100 px-1 rounded">{PUSD_SOLANA_MINT.slice(0, 10)}...</code></>
+                    {selectedToken === "USDT" ? (
+                      <>Using BOT Chain USDT. Contract: <code className="text-xs bg-green-100 px-1 rounded">{BOTCHAIN_USDT.slice(0, 10)}...</code></>
                     ) : (
-                      <>Using native SOL transfers on Solana mainnet.</>
+                      <>Using native BOT transfers on BOT Chain mainnet.</>
                     )}
                   </p>
                 </div>
@@ -464,16 +465,16 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Payment Token:</span>
                   <div className="flex items-center space-x-2">
-                    {selectedToken.toUpperCase() === 'PUSD' ? (
+                    {selectedToken.toUpperCase() === 'USDT' ? (
                       <img 
-                        src="/pusd.svg" 
-                        alt="PUSD"
+                        src="/usdt.png" 
+                        alt="USDT"
                         className="w-6 h-6 rounded-full object-cover"
                       />
-                    ) : selectedToken.toUpperCase() === 'SOL' ? (
+                    ) : selectedToken.toUpperCase() === 'BOT' ? (
                       <img 
-                        src="/solana-sol-logo.png" 
-                        alt="SOL"
+                        src="/bot-token.svg" 
+                        alt="BOT"
                         className="w-6 h-6 rounded-full object-cover"
                       />
                     ) : (
@@ -496,7 +497,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                 {/* Network Fees */}
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Network Fees:</span>
-                  <span className="font-medium text-gray-900">~{networkFees.toFixed(6)} SOL</span>
+                  <span className="font-medium text-gray-900">~{networkFees.toFixed(6)} BOT</span>
                 </div>
 
                 {/* Processing Time */}
@@ -510,7 +511,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                     <span className="font-semibold text-gray-900">Total Cost:</span>
                     <div className="text-right">
                       <div className="font-bold text-gray-900">{totalAmount.toLocaleString()} {selectedToken}</div>
-                      <div className="text-sm text-gray-600">+ ~{networkFees.toFixed(6)} SOL fees</div>
+                      <div className="text-sm text-gray-600">+ ~{networkFees.toFixed(6)} BOT fees</div>
                     </div>
                   </div>
                 </div>

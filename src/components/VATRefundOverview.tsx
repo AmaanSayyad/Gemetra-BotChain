@@ -193,7 +193,7 @@ export const VATRefundOverview: React.FC<VATRefundOverviewProps> = ({ setActiveT
                       <span className="font-medium text-gray-900">{refund.amount.toFixed(2)} {refund.token}</span>
                       {refund.transaction_hash && (
                         <a 
-                          href={`https://solscan.io/tx/${refund.transaction_hash}`}
+                          href={`https://scan.botchain.ai/tx/${refund.transaction_hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800"

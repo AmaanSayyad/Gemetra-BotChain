@@ -59,20 +59,18 @@ function usePointsState() {
   useEffect(() => {
     const sync = () => {
       const evm = isConnected && address ? address.trim() : "";
-      const sol = (phantomPublicKey || getConnectedAccount() || "").trim();
-      setWalletAddress(evm || sol || null);
+      const fallback = (phantomPublicKey || getConnectedAccount() || "").trim();
+      setWalletAddress(evm || fallback || null);
     };
 
     sync();
 
-    const provider = (window as unknown as { solana?: { on?: (e: string, fn: () => void) => void; removeListener?: (e: string, fn: () => void) => void } }).solana;
-    provider?.on?.("connect", sync);
-    provider?.on?.("accountChanged", sync);
+    const provider = window.ethereum;
+    provider?.on?.("accountsChanged", sync);
     provider?.on?.("disconnect", sync);
 
     return () => {
-      provider?.removeListener?.("connect", sync);
-      provider?.removeListener?.("accountChanged", sync);
+      provider?.removeListener?.("accountsChanged", sync);
       provider?.removeListener?.("disconnect", sync);
     };
   }, [isConnected, address, phantomPublicKey]);

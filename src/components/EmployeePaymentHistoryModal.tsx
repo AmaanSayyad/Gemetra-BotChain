@@ -198,7 +198,7 @@ export const EmployeePaymentHistoryModal: React.FC<EmployeePaymentHistoryModalPr
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-gray-500">Tx:</span>
                             <a
-                              href={`https://solscan.io/tx/${payment.transaction_hash}`}
+                              href={`https://scan.botchain.ai/tx/${payment.transaction_hash}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-blue-600 hover:text-blue-800 font-mono flex items-center space-x-1 hover:underline"
@@ -252,7 +252,7 @@ export const EmployeePaymentHistoryModal: React.FC<EmployeePaymentHistoryModalPr
                               <div className="flex items-center space-x-2 mb-1">
                                 <span className="text-xs text-gray-500">Tx:</span>
                                 <a
-                                  href={`https://solscan.io/tx/${payment.transaction_hash}`}
+                                  href={`https://scan.botchain.ai/tx/${payment.transaction_hash}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs text-blue-600 hover:text-blue-800 font-mono flex items-center space-x-1 hover:underline"

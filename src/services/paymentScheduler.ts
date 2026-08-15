@@ -28,7 +28,7 @@ export const processScheduledPayment = async (
     // Send payment
     const result = await sendBulkPayments(
       recipients,
-      (scheduledPayment.token?.toUpperCase() === 'SOL' ? 'SOL' : 'PUSD') as PaymentToken
+      (scheduledPayment.token?.toUpperCase() === 'BOT' || scheduledPayment.token?.toUpperCase() === 'SOL' ? 'BOT' : 'USDT') as PaymentToken
     );
     
     if (result.success && result.txHash) {

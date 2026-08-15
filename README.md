@@ -1,7 +1,7 @@
-# 🌍 Gemetra PUSD
+# 🌍 Gemetra — BOT Chain
 
 **Global Remittance Infrastructure for VAT Refunds & Payroll**  
-Wallet-native. AI-powered. Borderless. **PUSD (Palm USD)** on Solana
+Wallet-native. AI-powered. Borderless. **USDT + native BOT** on **BOT Chain mainnet** (chain ID 677).
 
 ## 🎥 Demo Video
 
@@ -18,11 +18,11 @@ Wallet-native. AI-powered. Borderless. **PUSD (Palm USD)** on Solana
 
 ## 🚀 Overview
 
-**Gemetra PUSD** is an **on-chain VAT Refund & Payroll Payment Infrastructure** centred on **Solana**, with **Palm USD (PUSD)** as the default stable payout rail and **native SOL** available as an alternate disbursement token in the same flows.
+**Gemetra** is an **on-chain VAT Refund & Payroll Payment Infrastructure** on **BOT Chain**, with **USDT** as the default stable payout rail and **native BOT** available as an alternate disbursement token in the same flows.
 
-Using **PUSD** SPL on Solana (**mint** `CZzgUBvxaMLwMhVSLgqJn3npmxoTo6nzMNQPAnwtHF3s`) plus **SOL** for native transfers, this platform enables:
+Using **BOT Chain bridged USDT** (`0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c`) plus **BOT** for native transfers, this platform enables:
 
-1. **VAT Refunds** – Tourists submit refund requests → receive **PUSD** or **SOL** on Solana (any [Wallet Standard](https://github.com/anza-xyz/wallet-standard) / adapter–supported wallet); Solana Pay QR supports the selected asset.
+1. **VAT Refunds** – Tourists submit refund requests → receive **USDT** or **BOT** on BOT Chain (MetaMask, BO Wallet, WalletConnect); EIP-681 QR supports the selected asset.
 2. **VAT Admin Panel** – Operators can view, filter, and export VAT refund claims (receipt info, personal info, merchant info, payment details)—tighten access with Supabase **RLS** in production. 
 3. **Payroll Automation** – Employers upload CSV → AI computes salaries → employees receive **PUSD** or **SOL** payouts, chosen before send.
 4. **Scheduled Payments** – Automate recurring and one-time payments with calendar view, per-schedule **token** (PUSD or SOL), and pre-approval system.
@@ -782,12 +782,11 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 #### Optional variables
 
 ```env
-# WalletConnect — optional. When set, enables the Solana WalletConnect adapter
-# (see src/solana/createSolanaWalletAdapters.ts). Injected wallets work without it.
+# WalletConnect — optional. Injected wallets (MetaMask / BO Wallet) work without it.
 VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
 
-# Solana RPC — recommended in production; public RPCs may throttle or fail
-# VITE_SOLANA_RPC_URL=https://your-solana-rpc-endpoint
+# GemetraCore on BOT Chain (set after deploy)
+# VITE_GEMETRA_CORE_ADDRESS=0x...
 
 # Gemini AI — optional; required only if you use the in-app AI assistant
 VITE_GEMINI_API_KEY=your_gemini_api_key

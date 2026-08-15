@@ -1,7 +1,7 @@
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAccount } from "wagmi";
 
-/** Connected Solana wallet address (any adapter), for gating + admin when legacy naming still says "Phantom". */
+/** Connected EVM address. Name kept so existing session gates stay intact. */
 export function usePhantomPublicKey(): string {
-  const { publicKey } = useWallet();
-  return publicKey?.toBase58() ?? '';
+  const { address, isConnected } = useAccount();
+  return isConnected && address ? address : "";
 }
