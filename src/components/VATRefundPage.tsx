@@ -15,7 +15,7 @@ interface VATRefundPageProps {
 function vatHistoryTokenLogo(token?: string): { src: string; alt: string } {
   const upper = (token || 'USDT').toUpperCase();
   if (upper === 'BOT' || upper === 'SOL') {
-    return { src: '/bot-token.svg', alt: 'BOT' };
+    return { src: '/botchain.png', alt: 'BOT' };
   }
   return { src: '/usdt.png', alt: 'USDT' };
 }
@@ -685,7 +685,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                           onClick={() => setSelectedToken('BOT')}
                           className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                          <img src="/botchain.png" alt="BOT" className="h-4 w-4 object-contain" />
                           <span>BOT</span>
                         </button>
                       </div>
@@ -806,7 +806,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                           onClick={() => setSelectedToken('BOT')}
                           className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                          <img src="/botchain.png" alt="BOT" className="h-4 w-4 object-contain" />
                           <span>BOT</span>
                         </button>
                       </div>
@@ -1193,7 +1193,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <div className="flex items-center justify-center gap-2 text-sm text-blue-800">
                           <img
-                              src="/bot-token.svg"
+                              src="/botchain.png"
                             alt="BOT Chain"
                             className="h-4 w-4 object-contain"
                           />

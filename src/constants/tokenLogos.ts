@@ -1,8 +1,8 @@
 /** Paths under `/public` for token artwork */
 
 export const TOKEN_LOGOS = {
-  BOT: "/bot-token.svg",
-  SOL: "/bot-token.svg",
+  BOT: "/botchain.png",
+  SOL: "/botchain.png",
   PUSD: "/usdt.png",
   USDT: "/usdt.png",
 } as const;

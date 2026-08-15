@@ -770,7 +770,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                     >
-                      <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                      <img src="/botchain.png" alt="BOT" className="h-4 w-4 object-contain" />
                       <span>BOT</span>
                     </button>
                   </div>
@@ -922,7 +922,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
                       onClick={() => setSelectedToken('BOT')}
                       className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
-                      <img src="/bot-token.svg" alt="BOT" className="h-4 w-4 object-contain" />
+                      <img src="/botchain.png" alt="BOT" className="h-4 w-4 object-contain" />
                       <span>BOT</span>
                     </button>
                   </div>

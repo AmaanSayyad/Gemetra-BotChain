@@ -300,7 +300,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
               <img
-                src={selectedToken === 'BOT' ? "/bot-token.svg" : "/usdt.png"}
+                src={selectedToken === 'BOT' ? "/botchain.png" : "/usdt.png"}
                 alt={`${selectedToken} logo`}
                 className="w-8 h-8 object-contain"
               />
@@ -473,7 +473,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                       />
                     ) : selectedToken.toUpperCase() === 'BOT' ? (
                       <img 
-                        src="/bot-token.svg" 
+                        src="/botchain.png" 
                         alt="BOT"
                         className="w-6 h-6 rounded-full object-cover"
                       />

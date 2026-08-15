@@ -41,7 +41,7 @@ function GemetraLandingPage() {
         <div className="z-10 flex w-full min-w-0 max-w-full flex-col items-center justify-center gap-5 sm:gap-7">
           <div className="mb-1 inline-flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-full bg-brand-50 px-3 py-2 sm:gap-3 sm:px-4 sm:py-2">
             <img
-              src="/bot-token.svg"
+              src="/botchain.png"
               alt="BOT Chain logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
@@ -145,7 +145,7 @@ function GemetraLandingPage() {
               <div className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center">
                 <img
                   className="h-8 object-cover"
-                  src="/bot-token.svg"
+                  src="/botchain.png"
                   alt="BOT Chain logo"
                 />
               </div>
@@ -162,7 +162,7 @@ function GemetraLandingPage() {
             <div className="flex items-center gap-3 mt-4">
               <img
                 className="h-8 w-8 object-contain"
-                src="/bot-token.svg"
+                src="/botchain.png"
                 alt="BOT Chain logo"
               />
               <img

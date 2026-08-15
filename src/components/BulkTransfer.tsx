@@ -239,7 +239,7 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
                       className={`border rounded-lg px-3 py-2 text-sm flex items-center justify-center gap-2 ${selectedToken === 'BOT' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
                     >
                       <img
-                        src="/bot-token.svg"
+                        src="/botchain.png"
                         alt="BOT"
                         className="w-4 h-4 object-contain"
                       />
@@ -371,7 +371,7 @@ export const BulkTransfer: React.FC<BulkTransferProps> = ({
                                   />
                                 ) : selectedToken.toUpperCase() === 'BOT' ? (
                                   <img 
-                                    src="/bot-token.svg" 
+                                    src="/botchain.png" 
                                     alt="BOT"
                                     className="w-4 h-4 rounded-full object-cover"
                                   />
