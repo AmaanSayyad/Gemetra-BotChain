@@ -4,6 +4,7 @@ dist
 .env.local
 .env.*.local
 .deployer.json
+.supabase-db-password
 deployments/local.json
 *.log
 .DS_Store
