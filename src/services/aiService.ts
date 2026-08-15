@@ -506,7 +506,7 @@ I can also answer product-grounded questions such as payroll totals, employee st
 • **USD:** ~$${priceData.price.toFixed(4)} (stablecoins hug $1; small drift is normal)
 • **24h:** ${ch}${priceData.change24h.toFixed(3)}%
 
-**In Gemetra (BOT Chain mainnet‑beta)**  
+**In Gemetra (BOT Chain testnet)**  
 Mint: \`${GEMETRA_APP_SNAPSHOT.usdtAddress}\`  
 Explorer: ${GEMETRA_APP_SNAPSHOT.explorers.token}`;
           thinkingContext.establishedFacts["pusd_reference_price"] = String(priceData.price);
@@ -530,7 +530,7 @@ const fallbackResponses = {
   greeting: [
     "Hello! I'm your Gemetra assistant. I can summarize your payroll/employee context, clarify how **BOT Chain + USDT (USDT)** payouts work here, fetch live spot prices where available, and keep answers grounded to your company data.",
     "Hi — I'm your in-app analyst for Gemetra. Ask about employees, payments, or VAT-style flows; I explain **BOT Chain** settlements via the **wallet adapter** (MetaMask, Family, WalletConnect, etc.) and **USDT** without guessing protocol stats.",
-    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**BOT Chain mainnet‑beta**, **USDT** or **BOT** payouts). What should we unpack?",
+    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**BOT Chain testnet**, **USDT** or **BOT** payouts). What should we unpack?",
   ],
   clarification: [
     "I want to give you the most accurate information! Could you clarify which specific aspect you're interested in? 🤔",
@@ -781,7 +781,7 @@ function tryGemetraDomainAnswer(
 1. From the dashboard shell, use **Connect wallet** in the **header** or **sidebar** (or the wallet control on the landing hero when offered).
 2. Choose a wallet in the **BOT Chain Wallet Adapter** modal (MetaMask, Family, WalletConnect, etc.). If you configured \`VITE_WALLETCONNECT_PROJECT_ID\`, **WalletConnect** appears for mobile / QR flows.
 3. Approve the connection in the wallet app or browser extension.
-4. Use **BOT Chain mainnet‑beta** and keep a small **BOT** balance for network fees.
+4. Use **BOT Chain testnet** and keep a small **BOT** balance for network fees.
 
 After you connect, **USDT** and **BOT** payouts are signed with that wallet in **Bulk transfer**, **VAT refund**, and **Scheduled payments** when you pick the token on each screen.`;
   }
@@ -810,12 +810,12 @@ In **Gemetra**, payroll and VAT payouts use:
 Every transfer consumes a small amount of **BOT** for gas.`;
   }
 
-  if (/mainnet-?beta|what is solana mainnet/i.test(m)) {
-    return `### BOT Chain **mainnet-beta**
+  if (/mainnet-?beta|what is solana mainnet|what is bot chain (mainnet|testnet)/i.test(m)) {
+    return `### BOT Chain **testnet**
 
-**mainnet-beta** is BOT Chain’s primary production cluster: real **BOT** and real tokens (including **USDT** SPL) live here. Transaction fees are paid in **BOT**; amounts are final and show on explorers like BOTScan.
+This Gemetra deployment settles on **BOT Chain testnet** (chain ID **968**). Fees are paid in **BOT**. USDT payouts use the testnet ERC-20. Transactions appear on BOTScan testnet.
 
-Gemetra’s payout flows in this app are intended for **mainnet-beta** (see product snapshot: **${G.payrollChain}**). Use devnet/testnet only if you deliberately point RPC and wallets there — not the default shipped UX.`;
+Product snapshot: **${G.payrollChain}**.`;
   }
 
   if (/(how (do|can) i|)send.*(token|pusd|sol).*solana/i.test(m) || /send tokens? on solana/i.test(m)) {
@@ -870,7 +870,7 @@ In Gemetra, a **bulk payment** is a **batch payroll send** from the **Bulk trans
 
 - You pick **one or many employees**, amounts, and the **token** (**USDT** or **BOT**).
 - The app shows a **preview** with totals, then asks your **BOT Chain wallet** to **sign** (often one transaction per recipient, depending on how the flow is built).
-- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **BOT Chain mainnet‑beta**.
+- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **BOT Chain testnet**.
 
 It’s the opposite of paying people one-by-one manually off-platform: everything stays **in-app**, **wallet-signed**, and tied to your employee list.`;
   }

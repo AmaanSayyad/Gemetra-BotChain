@@ -25,6 +25,8 @@ const NETWORKS = {
 const net = NETWORKS[BOTCHAIN_NETWORK];
 
 export const BOT_CHAIN_ID = net.id;
+export const BOT_CHAIN_NAME = net.name;
+export const BOT_CHAIN_LABEL = net.name;
 export const BOT_CHAIN_RPC = net.rpc;
 export const BOT_CHAIN_EXPLORER = net.explorer;
 export const BOTCHAIN_USDT_ADDRESS = net.usdt;

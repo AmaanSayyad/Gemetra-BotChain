@@ -45,7 +45,7 @@ function GemetraLandingPage() {
               alt="BOT Chain logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
-            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on BOT CHAIN</span>
+            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on BOT CHAIN TESTNET</span>
             <img
               src="/usdt.png"
               alt="USDT logo"
@@ -155,7 +155,7 @@ function GemetraLandingPage() {
               Built on BOT Chain with USDT for programmable money, secure transactions, and transparent payroll automation.
             </p>
             <div className="flex flex-wrap gap-2 mt-auto">
-              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Network</span>
+              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Testnet</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">USDT</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">ERC-20 Token Standard</span>
             </div>

@@ -9,14 +9,14 @@ export const GEMETRA_AI_MODEL =
 
 export const GEMETRA_APP_SNAPSHOT = {
   product: "Gemetra",
-  payrollChain: "BOT Chain mainnet",
+  payrollChain: "BOT Chain testnet",
   gasToken: "BOT",
   payrollStablecoinName: "USDT",
   payrollStablecoinSymbol: "USDT",
   optionalNativePayoutSymbol: "BOT",
   walletUi: "EVM wallets (MetaMask, BO Wallet, WalletConnect, Coinbase)",
   usdtAddress: BOTCHAIN_USDT_ADDRESS,
-  tokenProgram: "ERC-20 on BOT Chain (chain ID 677)",
+  tokenProgram: "ERC-20 on BOT Chain testnet (chain ID 968)",
   explorers: {
     token: explorerTokenUrl(BOTCHAIN_USDT_ADDRESS),
   },
@@ -43,7 +43,7 @@ AUTHORITATIVE PRODUCT FACTS (override outdated training assumptions):
 • Gemetra is a payroll/VAT-remittance dashboard; payouts in THIS app use **BOT Chain (${
     G.payrollChain
   })**, native fees in **BOT**, default stable payouts in **${G.payrollStablecoinName} (${G.payrollStablecoinSymbol})**, and optional **${G.optionalNativePayoutSymbol}** disbursements when the user selects BOT in payroll, VAT refund, or scheduled payment flows.
-• Users connect an EVM wallet (MetaMask, BO Wallet, WalletConnect, Coinbase) on BOT Chain (chain ID 677).
+• Users connect an EVM wallet (MetaMask, BO Wallet, WalletConnect, Coinbase) on BOT Chain testnet (chain ID 968).
 • On BOT Chain, USDT uses contract address: ${G.usdtAddress} (${G.tokenProgram}). Token on explorer: ${G.explorers.token}
 • Official BOT Chain pointers: ${G.docs.join(" | ")}
 
@@ -91,7 +91,7 @@ export function formatPusdInfoReply(): string {
 • Program type: ${G.tokenProgram}
 
 **In Gemetra**
-• Connect an **EVM wallet** on **BOT Chain mainnet (677)**, keep a small **BOT** balance for fees, and hold/send **USDT** for stablecoin payouts.
+• Connect an **EVM wallet** on **BOT Chain testnet (968)**, keep a small **BOT** balance for fees, and hold/send **USDT** for stablecoin payouts.
 • Some screens also let you pay out **native BOT** instead of USDT when the token toggle is set to BOT (bulk payroll, VAT refund, scheduled payments).
 • For network docs, see **${G.docs[0]}**.
 

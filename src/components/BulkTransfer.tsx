@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PaymentPreviewModal } from './PaymentPreviewModal';
 import { PaymentSuccessModal } from './PaymentSuccessModal';
 import { BOTCHAIN_USDT, type PaymentToken } from '../utils/ethereum';
-import { BOT_CHAIN_ID } from '../config/botchain';
+import { BOT_CHAIN_ID, BOT_CHAIN_LABEL } from '../config/botchain';
 import { useChainId } from 'wagmi';
 import type { Employee } from '../lib/supabase';
 
@@ -37,12 +37,12 @@ const NetworkWarning: React.FC<{ selectedToken: PaymentToken }> = ({ selectedTok
       <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center space-x-2">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-          <span className="text-green-800 font-medium text-sm sm:text-base">Connected to BOT Chain Mainnet</span>
+          <span className="text-green-800 font-medium text-sm sm:text-base">Connected to {BOT_CHAIN_LABEL}</span>
         </div>
         <p className="text-green-700 text-xs sm:text-sm mt-1">
           {selectedToken === 'USDT'
             ? <>Using BOT Chain USDT. Contract: <code className="text-xs bg-green-100 px-1 rounded">{BOTCHAIN_USDT.slice(0, 10)}...</code></>
-            : <>Using native BOT transfers on BOT Chain mainnet.</>}
+            : <>Using native BOT transfers on {BOT_CHAIN_LABEL}.</>}
         </p>
       </div>
     );
@@ -55,7 +55,7 @@ const NetworkWarning: React.FC<{ selectedToken: PaymentToken }> = ({ selectedTok
         <span className="text-red-800 font-medium text-sm sm:text-base">Wrong Network</span>
       </div>
       <p className="text-red-700 text-xs sm:text-sm mt-1">
-        Please switch to <strong>BOT Chain Mainnet</strong> to use real {selectedToken} transfers.
+        Please switch to <strong>{BOT_CHAIN_LABEL}</strong> to use real {selectedToken} transfers.
       </p>
     </div>
   );

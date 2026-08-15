@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Send, Users, DollarSign, Clock, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { sendBulkPayments, isWalletConnected, getConnectedAccount, formatAddress, BOTCHAIN_USDT, type PaymentToken } from '../utils/ethereum';
-import { explorerTxUrl, BOT_CHAIN_ID } from '../config/botchain';
+import { explorerTxUrl, BOT_CHAIN_ID, BOT_CHAIN_LABEL } from '../config/botchain';
 import { usePayments } from '../hooks/usePayments';
 import { usePoints } from '../hooks/usePoints';
 import { sendBulkPaymentEmails, PaymentEmailData } from '../utils/emailService';
@@ -339,7 +339,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                     <span className="text-red-800 font-medium">Wrong Network</span>
                   </div>
                   <p className="text-red-700 text-sm mt-1">
-                    Please switch to <strong>BOT Chain Mainnet</strong> to use real {selectedToken} transfers.
+                    Please switch to <strong>{BOT_CHAIN_LABEL}</strong> to use real {selectedToken} transfers.
                   </p>
                 </div>
               )}
@@ -349,13 +349,13 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                 <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-green-800 font-medium">Connected to BOT Chain Mainnet</span>
+                    <span className="text-green-800 font-medium">Connected to {BOT_CHAIN_LABEL}</span>
                   </div>
                   <p className="text-green-700 text-sm mt-1">
                     {selectedToken === "USDT" ? (
                       <>Using BOT Chain USDT. Contract: <code className="text-xs bg-green-100 px-1 rounded">{BOTCHAIN_USDT.slice(0, 10)}...</code></>
                     ) : (
-                      <>Using native BOT transfers on BOT Chain mainnet.</>
+                      <>Using native BOT transfers on {BOT_CHAIN_LABEL}.</>
                     )}
                   </p>
                 </div>
