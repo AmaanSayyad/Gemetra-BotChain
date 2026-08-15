@@ -1,7 +1,7 @@
 import { createAppKit } from "@reown/appkit/react";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { defineChain } from "@reown/appkit/networks";
-import { BOT_CHAIN_EXPLORER, BOT_CHAIN_ID, BOT_CHAIN_RPC } from "./botchain";
+import { BOT_CHAIN_EXPLORER, BOT_CHAIN_ID, BOT_CHAIN_RPC, botChain } from "./botchain";
 
 export const REOWN_PROJECT_ID =
   (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string | undefined)?.trim() ||
@@ -13,9 +13,9 @@ if (!REOWN_PROJECT_ID) {
 
 export const botChainNetwork = defineChain({
   id: BOT_CHAIN_ID,
-  caipNetworkId: "eip155:677",
+  caipNetworkId: `eip155:${BOT_CHAIN_ID}`,
   chainNamespace: "eip155",
-  name: "BOT Chain",
+  name: botChain.name,
   nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
   rpcUrls: {
     default: { http: [BOT_CHAIN_RPC], webSocket: [] },

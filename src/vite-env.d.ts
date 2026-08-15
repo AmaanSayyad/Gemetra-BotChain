@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_EMAILJS_SERVICE_ID?: string;
   readonly VITE_EMAILJS_TEMPLATE_ID?: string;
   readonly VITE_GEMETRA_CORE_ADDRESS?: string;
+  readonly VITE_BOTCHAIN_NETWORK?: string;
   readonly VITE_APP_PUBLIC_URL?: string;
 }
 

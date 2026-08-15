@@ -13,13 +13,30 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const deployerPath = resolve(root, ".deployer.json");
 const outDir = resolve(root, "deployments");
-const outPath = resolve(outDir, "botchain-mainnet.json");
-
+const NETWORK = (process.env.BOTCHAIN_NETWORK || "mainnet").toLowerCase();
+const outPath = resolve(outDir, `botchain-${NETWORK}.json`);
+const NETWORKS = {
+  mainnet: {
+    id: 677,
+    name: "BOT Chain",
+    rpc: "https://rpc.botchain.ai",
+    explorer: "https://scan.botchain.ai",
+    usdt: "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c",
+  },
+  testnet: {
+    id: 968,
+    name: "BOT Chain Testnet",
+    rpc: "https://rpc.bohr.life",
+    explorer: "https://scan.bohr.life",
+    usdt: process.env.BOTCHAIN_USDT || "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c",
+  },
+};
+const NET = NETWORKS[NETWORK] || NETWORKS.mainnet;
 const BOT_CHAIN = {
-  id: 677,
-  name: "BOT Chain",
+  id: NET.id,
+  name: NET.name,
   nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
-  rpcUrls: { default: { http: ["https://rpc.botchain.ai"] } },
+  rpcUrls: { default: { http: [NET.rpc] } },
 };
 
 function compile() {
@@ -53,12 +70,12 @@ async function main() {
 
   const publicClient = createPublicClient({
     chain: BOT_CHAIN,
-    transport: http("https://rpc.botchain.ai"),
+    transport: http(NET.rpc),
   });
   const walletClient = createWalletClient({
     account,
     chain: BOT_CHAIN,
-    transport: http("https://rpc.botchain.ai"),
+    transport: http(NET.rpc),
   });
 
   const balance = await publicClient.getBalance({ address: account.address });
@@ -81,14 +98,14 @@ async function main() {
 
   mkdirSync(outDir, { recursive: true });
   const payload = {
-    chainId: 677,
-    network: "BOT Chain Mainnet",
+    chainId: NET.id,
+    network: NET.name,
     gemetraCore: contractAddress,
     deployer: account.address,
     txHash: hash,
     deployedAt: new Date().toISOString(),
-    explorer: `https://scan.botchain.ai/address/${contractAddress}`,
-    usdt: "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c",
+    explorer: `${NET.explorer}/address/${contractAddress}`,
+    usdt: NET.usdt,
   };
   writeFileSync(outPath, JSON.stringify(payload, null, 2));
   console.log("GemetraCore:", contractAddress);

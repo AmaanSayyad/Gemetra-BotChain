@@ -1,0 +1,10 @@
+{
+  "chainId": 968,
+  "network": "BOT Chain Testnet",
+  "gemetraCore": "0xf924220b12dbedb039245c0b960b7dbb37bf1eb2",
+  "deployer": "0x562d89c9709B5F51dDAcABafC8e0e7A074186428",
+  "txHash": "0x2659121de64c8e4b59e7a6b52a5c019ec4d333737d48bd979b569082cc1ee21b",
+  "deployedAt": "2026-08-15T19:06:58.748Z",
+  "explorer": "https://scan.bohr.life/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2",
+  "usdt": "0x75edC9335175Fc0552D51D48439F229c10420fe3"
+}

@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "wallet:create": "node scripts/create-deployer-wallet.mjs",
-    "deploy:core": "node scripts/deploy-gemetra-core.mjs"
+    "deploy:core": "node scripts/deploy-gemetra-core.mjs",
+    "e2e:botchain": "node scripts/e2e-botchain.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.3.3",

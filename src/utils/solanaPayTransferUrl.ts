@@ -1,5 +1,5 @@
 import { parseUnits } from "viem";
-import { BOTCHAIN_USDT_ADDRESS, BOTCHAIN_USDT_DECIMALS } from "../config/botchain";
+import { BOTCHAIN_USDT_ADDRESS, BOTCHAIN_USDT_DECIMALS, BOT_CHAIN_ID } from "../config/botchain";
 import { normalizePaymentToken, type PaymentToken } from "./ethereum";
 
 /** EIP-681 payment URI for native BOT. */
@@ -13,7 +13,7 @@ export function buildNativePayUrl(opts: {
   const params = new URLSearchParams({ value });
   if (opts.label) params.set("label", opts.label);
   if (opts.message) params.set("message", opts.message);
-  return `ethereum:${opts.recipient}@677?${params.toString()}`;
+  return `ethereum:${opts.recipient}@${BOT_CHAIN_ID}?${params.toString()}`;
 }
 
 /** EIP-681 ERC-20 transfer URI for BOT Chain USDT. */
@@ -30,7 +30,7 @@ export function buildUsdtPayUrl(opts: {
   });
   if (opts.label) params.set("label", opts.label);
   if (opts.message) params.set("message", opts.message);
-  return `ethereum:${BOTCHAIN_USDT_ADDRESS}@677/transfer?${params.toString()}`;
+  return `ethereum:${BOTCHAIN_USDT_ADDRESS}@${BOT_CHAIN_ID}/transfer?${params.toString()}`;
 }
 
 export function buildPaymentQrUrl(opts: {

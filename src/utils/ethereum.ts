@@ -16,6 +16,7 @@ import {
   BOT_CHAIN_RPC,
   BOTCHAIN_USDT_ADDRESS,
   BOTCHAIN_USDT_DECIMALS,
+  DEFAULT_GEMETRA_CORE_ADDRESS,
 } from "../config/botchain";
 import { wagmiConfig } from "../config/wagmi";
 
@@ -64,7 +65,9 @@ export function normalizePaymentToken(token?: string | null): PaymentToken {
 }
 
 export function getGemetraCoreAddress(): Address | null {
-  const raw = (import.meta.env.VITE_GEMETRA_CORE_ADDRESS as string | undefined)?.trim();
+  const raw =
+    (import.meta.env.VITE_GEMETRA_CORE_ADDRESS as string | undefined)?.trim() ||
+    DEFAULT_GEMETRA_CORE_ADDRESS;
   if (raw && isAddress(raw)) return getAddress(raw);
   return null;
 }
@@ -80,7 +83,7 @@ export async function ensureBotChain(): Promise<void> {
   try {
     await switchChain(wagmiConfig, { chainId: BOT_CHAIN_ID });
   } catch {
-    throw new Error("Please switch to BOT Chain (chain ID 677) in your wallet.");
+    throw new Error(`Please switch to BOT Chain (chain ID ${BOT_CHAIN_ID}) in your wallet.`);
   }
 }
 
