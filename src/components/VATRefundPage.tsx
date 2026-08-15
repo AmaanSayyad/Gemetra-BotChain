@@ -1314,7 +1314,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                   <div className="flex items-center gap-2">
                     <img
                       src="/usdt.png"
-                      alt="PUSD"
+                      alt="USDT"
                       className="h-5 w-5 object-contain"
                     />
                     <span className="text-green-600 font-bold text-lg">{selectedToken} {refundAmount.toFixed(2)}</span>

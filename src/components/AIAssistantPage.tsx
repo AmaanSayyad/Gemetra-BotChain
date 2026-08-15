@@ -214,17 +214,17 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
     }
   };
 
-  // Curated prompts grounded in this app's data + PUSD/Solana scope.
+  // Curated prompts grounded in this app's data + USDT/BOT Chain scope.
   const allAvailableQuestions = [
     "What is USDT on BOT Chain?",
     "Tell me about BOT Chain USDT",
     "What is the BOT Chain USDT contract?",
     "Is USDT available on BOT Chain?",
-    "What is the current price of SOL?",
+    "What is the current price of BOT?",
     "What are BOT Chain transaction fees for payouts?",
     "How do I connect my wallet?",
     "How do I send tokens on BOT Chain?",
-    "What are SPL tokens?",
+    "What are ERC-20 tokens?",
     "What is BOT Chain mainnet?",
 
     // Company & employee prompts

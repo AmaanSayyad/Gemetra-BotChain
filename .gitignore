@@ -15,3 +15,8 @@ cache
 out
 artifacts
 typechain-types
+test-results
+playwright-report
+blob-report
+
+.vercel

@@ -45,7 +45,7 @@ function GemetraLandingPage() {
               alt="BOT Chain logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
-            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on SOLANA</span>
+            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on BOT CHAIN</span>
             <img
               src="/usdt.png"
               alt="USDT logo"
@@ -157,7 +157,7 @@ function GemetraLandingPage() {
             <div className="flex flex-wrap gap-2 mt-auto">
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Network</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">USDT</span>
-              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">SPL Token Standard</span>
+              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">ERC-20 Token Standard</span>
             </div>
             <div className="flex items-center gap-3 mt-4">
               <img
@@ -912,7 +912,7 @@ function GemetraLandingPage() {
                               Once validated, the smart contract computes the refund amount (VAT * rate - fee) and the tourist receives USDT stablecoin. The treasury disburses funds efficiently with fast finality, ensuring the tourist receives their refund before boarding their flight.
                             </p>
                             <div className="flex flex-wrap gap-3">
-                              <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">SPL / NATIVE TRANSFERS</span>
+                              <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">ERC-20 / NATIVE TRANSFERS</span>
                               <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">FAST FINALITY</span>
                               <span className="px-3 py-1 bg-brand-50 rounded-full text-xs font-medium text-brand-800">AUDITABILITY</span>
                             </div>

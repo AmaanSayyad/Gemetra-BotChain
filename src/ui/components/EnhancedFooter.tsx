@@ -61,7 +61,7 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                 </div>
                 
                 <p className="text-neutral-600 mb-4 text-sm leading-relaxed">
-                  Borderless payments infrastructure built on Solana with Palm USD (PUSD), a non-freezable digital dollar designed for global commerce.
+                  Borderless payments infrastructure built on BOT Chain with USDT, a stable digital dollar designed for global commerce.
                 </p>
                 
                 {/* Social Links */}
@@ -75,7 +75,7 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                     <Twitter size={16} className="text-neutral-600 group-hover:text-purple-600 transition-colors" />
                   </a>
                   <a
-                    href="https://github.com/AmaanSayyad/Gemetra-PUSD"
+                    href="https://github.com/AmaanSayyad/Gemetra-BotChain"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-9 h-9 rounded-lg bg-neutral-100 hover:bg-purple-100 transition-all duration-300 flex items-center justify-center group"
@@ -154,15 +154,15 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                     <span>Documentation</span>
                     <ExternalLink size={12} />
                   </a>
-                  <a href="https://www.palmusd.com/pages/developers.html" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
-                    <span>Palm USD Developers</span>
+                  <a href="https://dev-docs.botchain.ai/docs/Developers/quick-guide/" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
+                    <span>BOT Chain Developers</span>
                     <ExternalLink size={12} />
                   </a>
                   <a href="#help" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm">
                     Help Center
                   </a>
-                  <a href="https://www.palmusd.com/index.html" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
-                    <span>Palm USD Portal</span>
+                  <a href="https://www.botchain.ai/" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
+                    <span>BOT Chain Portal</span>
                     <ExternalLink size={12} />
                   </a>
                 </div>

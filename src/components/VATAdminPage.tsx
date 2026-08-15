@@ -7,7 +7,7 @@ import { getVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserSto
 import { TOKEN_LOGOS, tokenLogoSrc } from '../constants/tokenLogos';
 
 function vatAdminTokenIconSrc(token: string | undefined): string {
-  return tokenLogoSrc(token) ?? TOKEN_LOGOS.PUSD;
+  return tokenLogoSrc(token) ?? TOKEN_LOGOS.USDT;
 }
 
 interface VATRefundAdmin {
@@ -40,7 +40,7 @@ function paymentToVatRefundAdmin(payment: Payment): VATRefundAdmin {
     id: payment.id,
     user_id: payment.user_id,
     amount: payment.amount,
-    token: payment.token || 'PUSD',
+    token: payment.token || 'USDT',
     status: payment.status,
     transaction_hash: payment.transaction_hash,
     payment_date: payment.payment_date,
@@ -406,7 +406,7 @@ export const VATAdminPage: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredRefunds.map((refund, index) => {
                   const rowTokenIcon = vatAdminTokenIconSrc(refund.token);
-                  const rowTokenAlt = (refund.token || 'PUSD').toUpperCase();
+                  const rowTokenAlt = (refund.token || 'USDT').toUpperCase();
                   return (
                   <tr key={refund.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
@@ -592,7 +592,7 @@ export const VATAdminPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <img
                       src={vatAdminTokenIconSrc(selectedRefund.token)}
-                      alt={(selectedRefund.token || 'PUSD').toUpperCase()}
+                      alt={(selectedRefund.token || 'USDT').toUpperCase()}
                       className="h-5 w-5 object-contain"
                     />
                     <span className="text-lg font-bold text-gray-900">{selectedRefund.amount.toFixed(2)} {selectedRefund.token}</span>

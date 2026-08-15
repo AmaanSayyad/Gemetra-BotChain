@@ -523,7 +523,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                     <span className="text-green-800 font-medium text-sm">Secure Transaction</span>
                   </div>
                   <div className="text-xs text-green-700">
-                    All payments are processed on Solana using {selectedToken} with cryptographic security.
+                    All payments are processed on BOT Chain using {selectedToken} with cryptographic security.
                   </div>
                 </div>
               </div>
@@ -560,7 +560,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
                         onClick={viewOnExplorer}
                         className="text-sm text-gray-700 hover:text-gray-900 flex items-center space-x-1"
                       >
-                        <span>View on Solscan</span>
+                        <span>View on BOTScan</span>
                         <Send className="w-3 h-3" />
                       </button>
                     </>

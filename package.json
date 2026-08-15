@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "wallet:create": "node scripts/create-deployer-wallet.mjs",
     "deploy:core": "node scripts/deploy-gemetra-core.mjs",
-    "e2e:botchain": "node scripts/e2e-botchain.mjs"
+    "e2e:botchain": "node scripts/e2e-botchain.mjs",
+    "e2e:ui": "playwright test"
   },
   "dependencies": {
     "@emailjs/browser": "^4.3.3",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@playwright/test": "^1.62.1",
     "@types/babel__traverse": "^7.28.0",
     "@types/node": "^25.0.6",
     "@types/react": "^18.3.5",

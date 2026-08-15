@@ -216,7 +216,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
                   name="wallet_address"
                   value={formData.wallet_address}
                   onChange={handleInputChange}
-                  placeholder="Solana wallet address"
+                  placeholder="BOT Chain wallet address (0x...)"
                   className={`bg-gray-100 border border-gray-300 text-gray-900 rounded-lg px-4 py-2 sm:py-3 pl-10 sm:pl-10 w-full focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base font-mono ${errors.wallet_address ? 'border-red-500' : ''}`}
                 />
               </div>
