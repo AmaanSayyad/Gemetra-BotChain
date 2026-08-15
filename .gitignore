@@ -10,6 +10,7 @@ deployments/local.json
 .DS_Store
 .vercel
 .supabase
+supabase/.temp
 cache
 out
 artifacts
