@@ -3,6 +3,7 @@ import { Upload, FileCheck, QrCode, CheckCircle, AlertCircle, Search, Clock, Fil
 import { QRCodeSVG } from 'qrcode.react';
 import { getConnectedAccount, sendPayment, isValidEthereumAddress, recordVatRefundOnChain, type PaymentToken } from '../utils/ethereum';
 import { buildPaymentQrUrl } from '../utils/solanaPayTransferUrl';
+import { explorerTxUrl } from '../config/botchain';
 import { usePayments } from '../hooks/usePayments';
 import { usePoints } from '../hooks/usePoints';
 import { supabase } from '../lib/supabase';
@@ -1175,7 +1176,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                           <span className="text-green-800 font-medium text-sm">Transaction Hash:</span>
                           {transactionHash ? (
                             <a
-                              href={`https://scan.botchain.ai/tx/${transactionHash}`}
+                              href={explorerTxUrl(transactionHash)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-green-900 font-mono text-sm flex items-center justify-center sm:justify-end gap-2 hover:text-blue-600 hover:underline bg-white/60 px-3 py-1.5 rounded-lg transition-all"
@@ -1328,7 +1329,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-300 pb-3">
                     <span className="text-gray-700 font-medium">Transaction Hash:</span>
                     <a
-                      href={`https://scan.botchain.ai/tx/${transactionHash}`}
+                      href={explorerTxUrl(transactionHash)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 font-mono text-sm flex items-center gap-2 hover:text-blue-800 hover:underline bg-white px-3 py-1.5 rounded-lg border border-blue-200 transition-all"
@@ -1526,7 +1527,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
                           {refund.transaction_hash ? (
                             <a
-                              href={`https://scan.botchain.ai/tx/${refund.transaction_hash}`}
+                              href={explorerTxUrl(refund.transaction_hash)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-mono text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 transition-all hover:shadow-sm"

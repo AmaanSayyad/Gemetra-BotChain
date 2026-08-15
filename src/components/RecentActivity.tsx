@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { Clock, CheckCircle, Users, Send, ExternalLink } from 'lucide-react';
 import { usePayments } from '../hooks/usePayments';
+import { explorerTxUrl } from '../config/botchain';
 import type { Employee } from '../lib/supabase';
 
 interface Activity {
@@ -167,7 +168,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
                 {activity.transactionHash && (
                   <div className="mb-2">
                     <a
-                      href={`https://scan.botchain.ai/tx/${activity.transactionHash}`}
+                      href={explorerTxUrl(activity.transactionHash)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()} // Prevent triggering parent click

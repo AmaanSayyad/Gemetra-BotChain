@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Receipt, ArrowRight, Clock, CheckCircle, ExternalLink } from 'lucide-react';
 import { usePayments } from '../hooks/usePayments';
+import { explorerTxUrl } from '../config/botchain';
 
 interface VATRefundOverviewProps {
   setActiveTab: (tab: string) => void;
@@ -193,7 +194,7 @@ export const VATRefundOverview: React.FC<VATRefundOverviewProps> = ({ setActiveT
                       <span className="font-medium text-gray-900">{refund.amount.toFixed(2)} {refund.token}</span>
                       {refund.transaction_hash && (
                         <a 
-                          href={`https://scan.botchain.ai/tx/${refund.transaction_hash}`}
+                          href={explorerTxUrl(refund.transaction_hash)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800"

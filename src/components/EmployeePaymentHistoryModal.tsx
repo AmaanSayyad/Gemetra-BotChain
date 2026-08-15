@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import type { Employee, Payment } from '../lib/supabase';
 import { usePayments } from '../hooks/usePayments';
 import { tokenLogoSrc } from '../constants/tokenLogos';
+import { explorerTxUrl } from '../config/botchain';
 
 interface EmployeePaymentHistoryModalProps {
   isOpen: boolean;
@@ -198,7 +199,7 @@ export const EmployeePaymentHistoryModal: React.FC<EmployeePaymentHistoryModalPr
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-gray-500">Tx:</span>
                             <a
-                              href={`https://scan.botchain.ai/tx/${payment.transaction_hash}`}
+                              href={explorerTxUrl(payment.transaction_hash)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-blue-600 hover:text-blue-800 font-mono flex items-center space-x-1 hover:underline"
@@ -252,7 +253,7 @@ export const EmployeePaymentHistoryModal: React.FC<EmployeePaymentHistoryModalPr
                               <div className="flex items-center space-x-2 mb-1">
                                 <span className="text-xs text-gray-500">Tx:</span>
                                 <a
-                                  href={`https://scan.botchain.ai/tx/${payment.transaction_hash}`}
+                                  href={explorerTxUrl(payment.transaction_hash)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="text-xs text-blue-600 hover:text-blue-800 font-mono flex items-center space-x-1 hover:underline"

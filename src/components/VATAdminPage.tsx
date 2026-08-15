@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import type { Payment } from '../lib/supabase';
 import { getVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserStoredPayments';
 import { TOKEN_LOGOS, tokenLogoSrc } from '../constants/tokenLogos';
+import { explorerTxUrl } from '../config/botchain';
 
 function vatAdminTokenIconSrc(token: string | undefined): string {
   return tokenLogoSrc(token) ?? TOKEN_LOGOS.USDT;
@@ -468,7 +469,7 @@ export const VATAdminPage: React.FC = () => {
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       {refund.transaction_hash ? (
                         <a
-                          href={`https://scan.botchain.ai/tx/${refund.transaction_hash}`}
+                          href={explorerTxUrl(refund.transaction_hash)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-mono text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 transition-all hover:shadow-sm"
@@ -599,7 +600,7 @@ export const VATAdminPage: React.FC = () => {
                   </div>
                   {selectedRefund.transaction_hash && (
                     <a
-                      href={`https://scan.botchain.ai/tx/${selectedRefund.transaction_hash}`}
+                      href={explorerTxUrl(selectedRefund.transaction_hash)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 mt-2 text-xs text-blue-600 hover:text-blue-800 transition-colors"
@@ -741,7 +742,7 @@ export const VATAdminPage: React.FC = () => {
                     <div className="bg-white rounded-lg p-3 border border-gray-200">
                       <label className="text-xs text-gray-600 mb-1 block">Transaction Hash</label>
                       <a
-                        href={`https://scan.botchain.ai/tx/${selectedRefund.transaction_hash}`}
+                        href={explorerTxUrl(selectedRefund.transaction_hash)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-mono text-xs"

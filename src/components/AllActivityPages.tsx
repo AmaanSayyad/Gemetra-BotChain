@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, Clock, CheckCircle, Send, Users, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { usePayments } from '../hooks/usePayments';
 import type { Employee } from '../lib/supabase';
+import { explorerTxUrl } from '../config/botchain';
 
 interface Activity {
   id: string;
@@ -192,7 +193,7 @@ export const AllActivityPage: React.FC<AllActivityPageProps> = ({
                       {activity.transactionHash && (
                         <div className="mb-2">
                           <a
-                            href={`https://scan.botchain.ai/tx/${activity.transactionHash}`}
+                            href={explorerTxUrl(activity.transactionHash)}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()} // Prevent triggering parent click

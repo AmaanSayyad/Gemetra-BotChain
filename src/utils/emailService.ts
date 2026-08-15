@@ -43,7 +43,7 @@ Payment Details:
 - Date: ${emailData.paymentDate}
 - Company: ${emailData.companyName}
 ${emailData.transactionHash ? `- Transaction Hash: ${emailData.transactionHash}` : ''}
-${emailData.transactionHash ? `- View on BOTScan: https://scan.botchain.ai/tx/${emailData.transactionHash}` : ''}
+${emailData.transactionHash ? `- View on BOTScan: https://scan.bohr.life/tx/${emailData.transactionHash}` : ''}
 
 Thank you for your service.
 
@@ -55,7 +55,7 @@ ${emailData.companyName} Team`,
       payment_date: emailData.paymentDate,
       company_name: emailData.companyName,
       explorer_link: emailData.transactionHash 
-        ? `https://scan.botchain.ai/tx/${emailData.transactionHash}`
+        ? `https://scan.bohr.life/tx/${emailData.transactionHash}`
         : 'N/A'
     };
 
