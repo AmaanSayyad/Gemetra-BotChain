@@ -7,6 +7,7 @@ import {
   formatPusdInfoReply,
   solanaTxExplorerUrl,
 } from "./gemetraAiFacts";
+import { BOT_CHAIN_ID, BOT_CHAIN_NAME } from "../config/botchain";
 import { fetchCryptoPrice, formatPriceResponse } from './priceService';
 import { fixTypos } from './textProcessingService';
 
@@ -811,9 +812,9 @@ Every transfer consumes a small amount of **BOT** for gas.`;
   }
 
   if (/mainnet-?beta|what is solana mainnet|what is bot chain (mainnet|testnet)/i.test(m)) {
-    return `### BOT Chain **testnet**
+    return `### ${BOT_CHAIN_NAME}
 
-This Gemetra deployment settles on **BOT Chain testnet** (chain ID **968**). Fees are paid in **BOT**. USDT payouts use the testnet ERC-20. Transactions appear on BOTScan testnet.
+This Gemetra deployment settles on **${BOT_CHAIN_NAME}** (chain ID **${BOT_CHAIN_ID}**). Fees are paid in **BOT**. USDT payouts use the ${BOT_CHAIN_NAME} ERC-20. Transactions appear on BOTScan.
 
 Product snapshot: **${G.payrollChain}**.`;
   }

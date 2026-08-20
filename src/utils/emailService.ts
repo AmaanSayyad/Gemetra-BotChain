@@ -1,4 +1,5 @@
 import emailjs from "@emailjs/browser";
+import { explorerTxUrl } from "../config/botchain";
 
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY";
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID";
@@ -43,7 +44,7 @@ Payment Details:
 - Date: ${emailData.paymentDate}
 - Company: ${emailData.companyName}
 ${emailData.transactionHash ? `- Transaction Hash: ${emailData.transactionHash}` : ''}
-${emailData.transactionHash ? `- View on BOTScan: https://scan.bohr.life/tx/${emailData.transactionHash}` : ''}
+${emailData.transactionHash ? `- View on BOTScan: ${explorerTxUrl(emailData.transactionHash)}` : ''}
 
 Thank you for your service.
 
@@ -55,7 +56,7 @@ ${emailData.companyName} Team`,
       payment_date: emailData.paymentDate,
       company_name: emailData.companyName,
       explorer_link: emailData.transactionHash 
-        ? `https://scan.bohr.life/tx/${emailData.transactionHash}`
+        ? explorerTxUrl(emailData.transactionHash)
         : 'N/A'
     };
 
