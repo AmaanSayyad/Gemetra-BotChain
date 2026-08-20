@@ -10,7 +10,7 @@ const NETWORKS = {
     rpc: "https://rpc.botchain.ai",
     explorer: "https://scan.botchain.ai",
     usdt: "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c" as const,
-    core: "" as string,
+    core: "0xf924220b12dbedb039245c0b960b7dbb37bf1eb2" as string,
   },
   testnet: {
     id: 968,
