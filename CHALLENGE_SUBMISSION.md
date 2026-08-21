@@ -1,10 +1,12 @@
-# BOT Chain Builder Challenge #2 — Submission Notes
+# BOT Chain Builder Challenge #2 — RWA Submission
 
 **Project:** Gemetra  
-**Tracks:** **RWA Applications** (primary) · **AI Native Applications** (supporting / dual-track narrative)  
+**Track:** **RWA Applications** (Real World Assets)  
 **Live demo:** https://gemetra-botchain-ten.vercel.app  
 **Repository:** https://github.com/AmaanSayyad/Gemetra-BotChain  
 **Demo video:** https://youtu.be/U1QJ2HDRRQE  
+
+Gemetra is submitted as an **RWA remittance application**: it digitizes and settles **real-world VAT reclaim claims** and **wage distribution obligations** on BOT Chain Mainnet.
 
 ---
 
@@ -13,105 +15,99 @@
 | Requirement | Mandatory | Status | Evidence |
 | --- | --- | --- | --- |
 | BOT Chain **Mainnet** deployment | Yes | Done | `GemetraCore` `0xf924220b12dbedb039245c0b960b7dbb37bf1eb2` on chain **677** · [BOTScan](https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2) · deploy tx `0xb565ca7f…64443` |
-| Product form / complete user loop | Yes | Done | Landing → wallet connect → VAT / payroll / scheduled payouts → BOTScan verification |
-| Wallet interaction | Yes | Done | Reown AppKit (MetaMask, BO Wallet, WalletConnect, …) on `eip155:677` |
+| Product form / complete user loop | Yes | Done | Landing → wallet → **VAT claim / wage disburse** → BOTScan verification |
+| Wallet interaction | Yes | Done | Reown AppKit on `eip155:677` |
 | Public website / online demo | Yes | Done | https://gemetra-botchain-ten.vercel.app |
 | GitHub repository | Yes | Done | https://github.com/AmaanSayyad/Gemetra-BotChain |
 | Demo video | Recommended | Done | https://youtu.be/U1QJ2HDRRQE |
-| Project originality | Yes | Done | Original Gemetra product; **migrated** settlement from prior L1 to BOT Chain with new core + frontend |
+| Project originality | Yes | Done | Original Gemetra product; **migrated** settlement to BOT Chain with new core + frontend |
 
 ---
 
-## Track alignment
-
-### RWA Applications (primary)
+## RWA track alignment
 
 ```mermaid
 flowchart LR
   A["Real-world VAT claim<br/>tourist purchase + export"] --> B["Gemetra claim + receipt ref"]
   B --> C["recordVatRefund on GemetraCore"]
   C --> D["USDT/BOT settlement"]
-  E["Real-world payroll<br/>wage distribution"] --> F["CSV / AI pay plan"]
+  E["Real-world wage obligation<br/>payroll / schedules"] --> F["Payrun selection"]
   F --> G["disburse on GemetraCore"]
   G --> D
 ```
 
-- **Asset authenticity:** VAT amounts and payroll salaries map to real-world obligations (tax reclaim / wages).  
-- **Business loop:** claim/payrun → wallet signature → on-chain event + transfer → explorer proof + Supabase record.  
-- **Compliance feasibility:** receipt metadata, claim IDs, and immutable `VatRefundRecorded` / `Disbursed` events support audit trails.
-
-### AI Native Applications
+| RWA review focus | How Gemetra responds |
+| --- | --- |
+| **Authenticity of assets** | VAT amounts map to tax reclaim; payroll amounts map to wages owed |
+| **Business loop completeness** | Claim/payrun → wallet signature → on-chain event + transfer → explorer + DB record |
+| **Compliance feasibility** | Receipt metadata, claim IDs, immutable `VatRefundRecorded` / `Disbursed` events |
 
 ```mermaid
 sequenceDiagram
-  participant User
-  participant UI as Gemetra UI
-  participant AI as Gemini
-  participant Chain as GemetraCore
+  actor Op as RWA operator
+  participant App as Gemetra
+  participant W as Wallet
+  participant Core as GemetraCore
+  participant Scan as BOTScan
 
-  User->>UI: Ask / upload payroll context
-  UI->>AI: Grounded prompt (employees, BOT Chain facts)
-  AI-->>UI: Structured guidance / pay insights
-  User->>UI: Confirm on-chain action
-  UI->>Chain: disburse / recordVatRefund
-  Note over Chain: logAgentAction available for AI plan hash
+  Op->>App: Open VAT claim or wage payrun
+  App->>W: Connect / sign on BOT mainnet
+  W->>Core: recordVatRefund and/or disburse
+  Core-->>Scan: Registry + settlement events
+  App-->>Op: Tx hash · claim/payment history
 ```
-
-- AI is used for **payroll parsing**, **ops Q&A**, and **grounded product facts** (not generic marketing copy only).  
-- On-chain hooks: settlement via `disburse` / VAT via `recordVatRefund`; `logAgentAction` is on `GemetraCore` for agent audit (wire into live agent confirmations as you deepen the AI track).
 
 ---
 
-## Migration answers (required for migrated projects)
+## Migration answers
 
 ### Why BOT Chain?
 
-- EVM toolchain familiarity with **low-fee, fast finality** rails suited to remittance.  
-- Native ecosystem USDT + BOT DEX/bridge/wallet infrastructure.  
-- Aligns with BOT’s **RWA + AI agent economy** direction for tax and payroll products.
+- Low-fee, fast-finality EVM rails suited to **remittance of real-world obligations**.  
+- Ecosystem USDT + bridge/DEX/wallet for stable settlement.  
+- Aligns with BOT’s **RWA infrastructure** direction (asset distribution, claim registry, auditability).
 
 ### What does the BOT Chain version add?
 
 | Capability | Detail |
 | --- | --- |
-| `GemetraCore` | Custody-free batch `disburse`, VAT registry, agent action log |
-| Network | Mainnet `677` + testnet toggle for engineering |
-| Wallets | Full Reown AppKit EVM adapter (not a superficial RPC swap) |
-| Tokens | Bridged USDT ERC-20 + native BOT payouts in the same UX |
-| Product | End-to-end web app hosted on Vercel with explorer links |
+| `GemetraCore` | Custody-free `disburse` + VAT claim registry |
+| Network | Mainnet `677` (challenge / production) |
+| Wallets | Full Reown AppKit EVM adapter |
+| Tokens | Bridged USDT ERC-20 + native BOT payouts |
+| Product | End-to-end web app on Vercel with BOTScan links |
 
 ### How will you grow users & on-chain activity?
 
-1. SME payroll cohorts (recurring `disburse` volume).  
-2. Tourist VAT corridors (claim registry + refund txs).  
-3. Iterate AI → on-chain agent logging for automated payruns.  
-4. Stay on BOT mainnet for demo day, grants, and ecosystem listing.
+1. Tourist **VAT reclaim** corridors (claim registry + refund txs).  
+2. SME **wage distribution** cohorts (recurring `disburse` volume).  
+3. Stay on BOT mainnet for Demo Day, ecosystem listing, and continued claim/payrun throughput.
 
 ---
 
-## Review-criteria self score (honest)
+## Review-criteria notes (RWA)
 
 | Dimension | Weight | Notes |
 | --- | --- | --- |
-| Product completion | 30% | Strong loop; polish RLS, treasury points conversion, live Gemini key for demos |
+| Product completion | 30% | Full VAT + wage loops on mainnet |
 | Mainnet integration | 25% | Contract + frontend + explorer verified |
-| Innovation | 20% | Dual VAT+payroll remittance on BOT; deepen AI→chain |
-| UX | 15% | Landing-first, AppKit connect, dashboard |
+| Innovation | 20% | Dual RWA remittance (tax reclaim + wages) on one core |
+| UX | 15% | Landing-first, AppKit, claim/payrun dashboards |
 | Technical quality | 10% | viem/wagmi, Solidity core, Supabase |
 
 ---
 
-## Judge quick-start
+## Judge quick-start (RWA path)
 
 1. Open https://gemetra-botchain-ten.vercel.app  
-2. Connect wallet → switch / add **BOT Chain (677)**  
-3. Fund small **BOT** (gas) + optional **USDT**  
-4. Run a payroll preview or VAT claim → confirm tx on [BOTScan](https://scan.botchain.ai)  
-5. Read architecture sequences in [README.md](./README.md)  
+2. Connect wallet → **BOT Chain (677)**  
+3. Fund small **BOT** (gas) + **USDT**  
+4. Run a **VAT claim** and/or **wage bulk disburse** → confirm on [BOTScan](https://scan.botchain.ai)  
+5. Skim RWA sequences in [README.md](./README.md)  
 
 ---
 
-## Core infrastructure references
+## Core infrastructure
 
 - https://www.botchain.ai/  
 - https://dev-docs.botchain.ai/docs/Developers/quick-guide/  

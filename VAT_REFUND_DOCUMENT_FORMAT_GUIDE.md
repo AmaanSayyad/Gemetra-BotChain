@@ -1,6 +1,6 @@
 # VAT Refund Document Format Guide
 
-> Gemetra settles VAT refunds on **BOT Chain Mainnet** (chain ID **677**) in **USDT** or native **BOT**.  
+> **RWA focus:** tourist **VAT reclaim claims** are real-world tax assets. Gemetra settles them on **BOT Chain Mainnet** (chain ID **677**) in **USDT** or native **BOT**.  
 > Receiver wallets must be **EVM addresses**. On-chain: `GemetraCore.recordVatRefund` + settlement.
 
 ```mermaid

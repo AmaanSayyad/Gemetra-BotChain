@@ -1,10 +1,10 @@
-# Gemetra — BOT Chain Mainnet
+# Gemetra — RWA Remittance on BOT Chain Mainnet
 
-**Global remittance for VAT refunds & payroll**  
-Wallet-native · AI-assisted · **USDT + native BOT** on **BOT Chain Mainnet** (chain ID **677**)
+**Real-world VAT refunds & wage distribution** settled in **USDT / native BOT** on **BOT Chain Mainnet** (chain ID **677**).
 
 | | |
 | --- | --- |
+| **Track** | **RWA Applications** (BOT Builder Challenge #2) |
 | **Live demo** | https://gemetra-botchain-ten.vercel.app |
 | **GitHub** | https://github.com/AmaanSayyad/Gemetra-BotChain |
 | **Demo video** | https://youtu.be/U1QJ2HDRRQE |
@@ -15,23 +15,15 @@ Wallet-native · AI-assisted · **USDT + native BOT** on **BOT Chain Mainnet** (
 
 ## Overview
 
-Gemetra is a **consumer-ready** remittance product on BOT Chain that unifies two real-world money flows:
+Gemetra is a **consumer-ready RWA remittance product**: it takes **real-world financial obligations**—tourist **VAT reclaim claims** and **payroll wage distribution**—and completes them on BOT Chain with wallet-signed USDT/BOT transfers plus an immutable on-chain claim registry.
 
-1. **RWA / VAT refunds** — tourist tax reclaim claims with on-chain settlement and claim registry  
-2. **AI-assisted payroll** — CSV/AI parsing → wallet-signed **USDT** or **BOT** batch disbursement  
+Users connect an EVM wallet (MetaMask, BO Wallet, WalletConnect via Reown AppKit), keep custody of funds, and finish the full business loop on **mainnet**.
 
-Users connect an EVM wallet (MetaMask, BO Wallet, WalletConnect via Reown AppKit), stay in custody of funds, and complete the full business loop on **mainnet**.
-
----
-
-## Challenge tracks (AI × RWA)
-
-| Track | How Gemetra maps |
-| --- | --- |
-| **RWA** | VAT claims are real-world tax assets; payroll is real-world wage distribution; `recordVatRefund` + `disburse` close the on-chain loop |
-| **AI Native** | Gemini powers salary parsing, compliance Q&A, and ops assistance over company data; designed to feed payroll plans that settle on-chain |
-
-See [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) for requirement-by-requirement mapping, migration rationale, and review checklist.
+| RWA surface | Real-world asset / obligation | On-chain close |
+| --- | --- | --- |
+| VAT refunds | Tax reclaim after export validation | `recordVatRefund` + USDT/BOT payout |
+| Payroll / scheduled pay | Wages owed to workers | `disburse` batch settlement |
+| Claim / payrun records | Audit & compliance evidence | BOTScan events + Supabase mirror |
 
 ---
 
@@ -51,42 +43,47 @@ See [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) for requirement-by-requ
 Artifact: [`deployments/botchain-mainnet.json`](./deployments/botchain-mainnet.json)  
 Contract: [`contracts/GemetraCore.sol`](./contracts/GemetraCore.sol)
 
-`GemetraCore` never custody funds. It:
+`GemetraCore` never custodies funds. It:
 
-- **`disburse`** — batch native BOT or ERC-20 USDT `transferFrom` payer → recipients  
-- **`recordVatRefund`** — immutable VAT claim registry event  
-- **`logAgentAction`** — AI / agent audit trail for on-chain decision logging  
+- **`disburse`** — batch native BOT or ERC-20 USDT `transferFrom` payer → recipients (payroll / refund distribution)  
+- **`recordVatRefund`** — immutable VAT claim registry for RWA audit  
+- **`logAgentAction`** — optional ops / automation audit trail  
 
 ---
 
-## System architecture
+## System architecture (RWA)
 
 ```mermaid
 flowchart TB
+  subgraph RealWorld["Real-world assets & obligations"]
+    VATRW["VAT reclaim claims<br/>tourist tax"]
+    WAGERW["Wage obligations<br/>payroll / schedules"]
+  end
+
   subgraph Client
     WEB["React + Vite app"]
     W["EVM wallets<br/>Reown AppKit"]
   end
 
   subgraph App
-    UI["Dashboard · VAT · Payroll · AI"]
+    UI["VAT · Payroll · Admin · Ops"]
     ETH["ethereum.ts / wagmi / viem"]
-    AI["Gemini AI service"]
   end
 
   subgraph Data
-    SB["Supabase<br/>employees · payments · VAT · chat"]
+    SB["Supabase<br/>claims · payments · employees"]
   end
 
   subgraph BOT["BOT Chain Mainnet · 677"]
-    CORE["GemetraCore"]
+    CORE["GemetraCore<br/>registry + disburse"]
     USDT["USDT ERC-20"]
     SCAN["BOTScan"]
   end
 
+  VATRW --> UI
+  WAGERW --> UI
   WEB --> UI
   UI --> ETH
-  UI --> AI
   UI --> SB
   ETH --> W
   W --> CORE
@@ -97,11 +94,11 @@ flowchart TB
 
 ---
 
-## End-to-end product loop
+## End-to-end RWA product loop
 
 ```mermaid
 sequenceDiagram
-  actor User as Employer / Operator
+  actor Op as Operator / Employer
   participant UI as Gemetra Web
   participant W as Wallet (AppKit)
   participant C as GemetraCore
@@ -109,33 +106,32 @@ sequenceDiagram
   participant S as Supabase
   participant X as BOTScan
 
-  User->>UI: Open live demo / connect wallet
-  UI->>W: AppKit Connect (eip155:677)
+  Op->>UI: Open demo · connect wallet (eip155:677)
   W-->>UI: address + chain
 
-  alt Payroll bulk
-    User->>UI: Upload CSV / select employees + USDT|BOT
+  alt VAT refund (tax reclaim RWA)
+    Op->>UI: Claim + receipt metadata
+    UI->>W: Sign payout
+    W->>C: recordVatRefund(claimId, …)
+    W->>C: disburse / transfer USDT|BOT
+    C-->>X: VatRefundRecorded + Disbursed
+    UI->>S: Persist claim + tx hash
+  else Payroll / wage distribution RWA
+    Op->>UI: Employees + amounts + USDT|BOT
     UI->>W: approve USDT → GemetraCore (if needed)
     W->>T: approve(core, total)
-    UI->>W: disburse(token, recipients, amounts)
     W->>C: disburse(...)
-    C->>T: transferFrom(payer → employees)
-    C-->>X: Disbursed events
-    UI->>S: store payment rows + tx hash
-  else VAT refund
-    User->>UI: Enter claim / upload receipt
-    UI->>W: sendPayment or disburse
-    W->>C: recordVatRefund(claimId, …)
-    C-->>X: VatRefundRecorded
-    UI->>S: persist VAT claim + explorer link
+    C->>T: transferFrom(payer → recipients)
+    C-->>X: Disbursed
+    UI->>S: Store payment rows
   end
 
-  User->>X: Verify tx / claim on BOTScan
+  Op->>X: Verify on BOTScan
 ```
 
 ---
 
-## VAT refund (RWA) sequence
+## VAT refund (core RWA) sequence
 
 ```mermaid
 sequenceDiagram
@@ -144,10 +140,10 @@ sequenceDiagram
   participant Gemetra as Gemetra App
   participant Oracle as Export oracle (ops)
   participant Core as GemetraCore
-  participant Wallet as Tourist / payer wallet
+  participant Wallet as Payer wallet
 
   Tourist->>Retailer: Purchase (VAT included)
-  Retailer->>Gemetra: Issue tax-free tag / claim metadata
+  Retailer->>Gemetra: Tax-free tag / claim metadata
   Tourist->>Oracle: Airport export validation
   Oracle->>Gemetra: Validated claim (receipt ref)
   Gemetra->>Wallet: Request USDT/BOT payout signature
@@ -157,29 +153,25 @@ sequenceDiagram
 
 ---
 
-## Payroll + AI assist sequence
+## Wage distribution (RWA) sequence
 
 ```mermaid
 sequenceDiagram
   actor HR as HR / CFO
   participant UI as Gemetra
-  participant AI as Gemini assistant
   participant W as Wallet
   participant C as GemetraCore
 
-  HR->>UI: Upload payroll CSV / ask assistant
-  UI->>AI: Parse salaries, jurisdictions, net USDT
-  AI-->>UI: Structured pay plan + explanations
-  HR->>UI: Review preview · select USDT or BOT
+  HR->>UI: Upload / select payrun (real wage obligations)
+  HR->>UI: Preview totals · USDT or BOT
   UI->>W: User confirms & signs
   W->>C: disburse(payroll)
-  Note over C: Optional logAgentAction for AI plan hash
   C-->>UI: tx hash · BOTScan link
 ```
 
 ---
 
-## Scheduled payments sequence
+## Scheduled wage runs
 
 ```mermaid
 sequenceDiagram
@@ -189,27 +181,26 @@ sequenceDiagram
   participant W as Wallet
   participant C as GemetraCore
 
-  User->>UI: Create schedule (USDT|BOT, recurrence)
+  User->>UI: Schedule USDT|BOT wage run
   UI->>LS: Persist schedule + pre-approval limits
-  loop When due (browser session)
-    UI->>UI: Check due totals vs pre-approval
-    UI->>W: Request signed disburse / transfer
-    W->>C: Settlement on BOT Chain
+  loop When due
+    UI->>W: Sign disburse / transfer
+    W->>C: Settle on BOT Chain
     UI->>LS: Mark processed · next date
   end
 ```
 
 ---
 
-## Features
+## Features (RWA product)
 
-- **Wallet-native UX** — Reown AppKit (MetaMask, Family/BO Wallet, WalletConnect, Coinbase)  
-- **VAT refunds** — claim form, payout in USDT/BOT, on-chain `recordVatRefund`  
-- **VAT admin** — filter/export claims (harden with Supabase RLS in production)  
-- **Bulk payroll** — CSV + preview + `GemetraCore.disburse`  
-- **Scheduled payments** — calendar, recurrence, per-token pre-approval  
-- **Points** — earn on activity; convert toward USDT ([POINTS_SYSTEM.md](./POINTS_SYSTEM.md))  
-- **AI assistant** — Gemini over company context + BOT Chain product facts  
+- **VAT refunds** — claim form, USDT/BOT payout, on-chain `recordVatRefund`  
+- **VAT admin** — filter/export claims for compliance ops  
+- **Wage / bulk payroll** — CSV + preview + `GemetraCore.disburse`  
+- **Scheduled distributions** — calendar, recurrence, per-token pre-approval  
+- **Wallet-native UX** — Reown AppKit on chain 677  
+- **RWA engagement points** — earn on completed VAT/wage settlements ([POINTS_SYSTEM.md](./POINTS_SYSTEM.md))  
+- **Ops assistant** (optional) — in-app help over claim/payrun context; not the product’s RWA thesis  
 
 ---
 
@@ -222,7 +213,6 @@ sequenceDiagram
 | Chain | BOT Chain Mainnet `677` |
 | Contracts | Solidity `GemetraCore` |
 | Data | Supabase (Postgres) |
-| AI | Google Gemini (`VITE_GEMINI_API_KEY`) |
 | Hosting | Vercel |
 
 ---
@@ -232,7 +222,6 @@ sequenceDiagram
 ```bash
 pnpm install
 cp .env.example .env
-# set VITE_SUPABASE_* and mainnet vars (see below)
 pnpm dev
 ```
 
@@ -244,18 +233,13 @@ VITE_SUPABASE_ANON_KEY=...
 VITE_WALLETCONNECT_PROJECT_ID=...
 VITE_BOTCHAIN_NETWORK=mainnet
 VITE_GEMETRA_CORE_ADDRESS=0xf924220b12dbedb039245c0b960b7dbb37bf1eb2
-# optional
-VITE_GEMINI_API_KEY=...
-VITE_GEMINI_MODEL=gemini-2.5-flash
 ```
-
-Testnet remains available via `VITE_BOTCHAIN_NETWORK=testnet` for local experiments; **challenge / production use mainnet**.
 
 ### Deploy contracts (optional)
 
 ```bash
-pnpm wallet:create          # writes gitignored .deployer.json
-pnpm deploy:core            # BOTCHAIN_NETWORK=mainnet by default
+pnpm wallet:create
+pnpm deploy:core
 ```
 
 ---
@@ -264,24 +248,19 @@ pnpm deploy:core            # BOTCHAIN_NETWORK=mainnet by default
 
 | Doc | Purpose |
 | --- | --- |
-| [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) | BOT Builder Challenge #2 checklist & migration answers |
-| [POINTS_SYSTEM.md](./POINTS_SYSTEM.md) | Points earn/convert flow |
+| [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) | RWA track checklist & migration answers |
 | [VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md](./VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md) | Receipt / claim document formats |
 | [VAT_REFUND_SAMPLE_DATA.md](./VAT_REFUND_SAMPLE_DATA.md) | Sample VAT claim payloads |
-| `samples/` | JSON / CSV examples |
+| [POINTS_SYSTEM.md](./POINTS_SYSTEM.md) | RWA engagement points on settlements |
+| `samples/` | JSON / CSV claim examples |
 
 ---
 
 ## Why BOT Chain (migration)
 
-Gemetra previously targeted another L1. The BOT Chain version adds:
+Gemetra moved settlement to BOT Chain to run **RWA remittance** (VAT reclaim + wage distribution) on an EVM mainnet with USDT rails, custody-free `GemetraCore`, and BOTScan-verifiable claim/payrun evidence—not a superficial redeploy.
 
-- **Mainnet `GemetraCore`** settlement + VAT registry + agent log  
-- **EVM wallet stack** (AppKit) and bridged **USDT**  
-- **Native BOT** gas + optional native payroll/refund payouts  
-- Frontend locked to chain **677** with BOTScan explorers  
-
-Continued growth: SME payroll + tourist VAT corridors, keep iterating on BOT mainnet (see challenge doc).
+Growth focus: tourist VAT corridors + SME wage runs on BOT mainnet (see challenge doc).
 
 ---
 

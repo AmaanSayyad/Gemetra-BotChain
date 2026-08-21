@@ -1,6 +1,6 @@
 # VAT Refund Form — Sample Data (BOT Chain)
 
-Sample claim payloads for Gemetra on **BOT Chain Mainnet**. Receiver addresses are **EVM (`0x…`)** wallets. Payouts settle in **USDT** (default) or native **BOT**.
+**RWA sample payloads** for tourist **VAT reclaim claims** on **BOT Chain Mainnet**. Receiver addresses are **EVM (`0x…`)** wallets. Payouts settle in **USDT** (default) or native **BOT**.
 
 ```mermaid
 sequenceDiagram
