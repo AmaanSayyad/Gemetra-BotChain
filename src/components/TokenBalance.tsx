@@ -19,7 +19,6 @@ export const TokenBalance: React.FC = () => {
   const [balances, setBalances] = useState({
     totalUSD: 0,
     eth: 0,
-    pusd: 0,
     usdt: 0,
     totalCoins: 0,
   });
@@ -48,20 +47,17 @@ export const TokenBalance: React.FC = () => {
 
         setSolUsdSpot(solUsd);
 
-        const pusdBalance = accountBalance.mnee;
-        const stableUsd = pusdBalance + accountBalance.usdt;
-        const totalUSD = stableUsd + (solUsd != null ? accountBalance.eth * solUsd : 0);
+        const usdtBalance = accountBalance.usdt;
+        const totalUSD = usdtBalance + (solUsd != null ? accountBalance.eth * solUsd : 0);
 
         const totalCoins =
           (accountBalance.eth > 0 ? 1 : 0) +
-          (pusdBalance > 0 ? 1 : 0) +
-          (accountBalance.usdt > 0 ? 1 : 0);
+          (usdtBalance > 0 ? 1 : 0);
 
         setBalances({
           totalUSD,
           eth: accountBalance.eth,
-          pusd: pusdBalance,
-          usdt: accountBalance.usdt,
+          usdt: usdtBalance,
           totalCoins,
         });
       } else {
@@ -70,7 +66,6 @@ export const TokenBalance: React.FC = () => {
         setBalances({
           totalUSD: 0,
           eth: 0,
-          pusd: 0,
           usdt: 0,
           totalCoins: 0,
         });
@@ -81,7 +76,6 @@ export const TokenBalance: React.FC = () => {
       setBalances({
         totalUSD: 0,
         eth: 0,
-        pusd: 0,
         usdt: 0,
         totalCoins: 0,
       });
@@ -255,17 +249,8 @@ export const TokenBalance: React.FC = () => {
               />
             )}
 
-            {/* USDT used as payroll stable (legacy field name pusd) */}
-            {balances.pusd > 0 && (
-              <TokenRow
-                symbol="USDT"
-                amount={balances.pusd}
-                usdValue={balances.pusd * 1}
-              />
-            )}
-
             {/* USDT (BOT Chain ERC-20) */}
-            {balances.usdt > 0 && balances.pusd === 0 && (
+            {balances.usdt > 0 && (
               <TokenRow
                 symbol="USDT"
                 amount={balances.usdt}
@@ -274,7 +259,7 @@ export const TokenBalance: React.FC = () => {
             )}
 
             {/* Empty state when no tokens */}
-            {balances.eth === 0 && balances.pusd === 0 && balances.usdt === 0 && (
+            {balances.eth === 0 && balances.usdt === 0 && (
               <div className="text-center py-6 sm:py-8 text-gray-500">
                 <div className="text-xs sm:text-sm">No tokens found</div>
                 <div className="text-xs text-gray-400 mt-1">

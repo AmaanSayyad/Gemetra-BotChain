@@ -1,39 +1,39 @@
-
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import DashboardLayout from "./components/DashboardLayout";
 import { LandingPage } from "./components/LandingPage";
 import { Header } from "./components/Header";
 import { usePhantomPublicKey } from "./hooks/usePhantomPublicKey";
+import { AppNavigationProvider, useAppNavigation } from "./hooks/useAppNavigation";
 
+const APP_TABS = [
+  "dashboard",
+  "employees",
+  "bulk-transfer",
+  "ai-assistant-chat",
+  "ai-assistant-history",
+  "settings",
+] as const;
 
-function App() {
+function AppShell() {
   const { address, isConnected } = useAccount();
   const phantomPublicKey = usePhantomPublicKey();
+  const { activeTab, setActiveTab } = useAppNavigation();
   const hasAppSession =
     Boolean(isConnected && address) || Boolean(phantomPublicKey.trim());
-  const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem("gemetra_active_tab") || "landing";
-  });
+  const inApp = hasAppSession && APP_TABS.includes(activeTab as (typeof APP_TABS)[number]);
 
-  // persist active tab
+  // If the wallet disconnects while inside the app, return to the landing page.
+  // Do NOT auto-enter the dashboard on connect — users should read the landing first.
   useEffect(() => {
-    localStorage.setItem("gemetra_active_tab", activeTab);
-  }, [activeTab]);
-
-  // handle redirects
-  useEffect(() => {
-    if (hasAppSession && activeTab === "landing") {
-      setActiveTab("dashboard");
-    } else if (!hasAppSession && !["landing"].includes(activeTab)) {
+    if (!hasAppSession && activeTab !== "landing") {
       setActiveTab("landing");
     }
-  }, [hasAppSession, activeTab]);
+  }, [hasAppSession, activeTab, setActiveTab]);
 
   const renderActiveComponent = () => {
-    if (hasAppSession && ["dashboard", "employees", "bulk-transfer", "ai-assistant-chat", "ai-assistant-history", "settings"].includes(activeTab)) {
-      // Load company name from localStorage if available
+    if (inApp) {
       const sessionKey =
         (isConnected && address ? address : phantomPublicKey) || "";
       const savedCompanyName = sessionKey
@@ -61,7 +61,7 @@ function App() {
         <main className="relative min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
-              key={hasAppSession ? "dashboard" : "landing"}
+              key={inApp ? "dashboard" : "landing"}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -73,8 +73,15 @@ function App() {
           </AnimatePresence>
         </main>
       </div>
-   
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AppNavigationProvider>
+      <AppShell />
+    </AppNavigationProvider>
   );
 }
 

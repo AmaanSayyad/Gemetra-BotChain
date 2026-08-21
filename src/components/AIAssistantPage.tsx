@@ -225,7 +225,7 @@ export const AIAssistantPage: React.FC<AIAssistantPageProps> = ({
     "How do I connect my wallet?",
     "How do I send tokens on BOT Chain?",
     "What are ERC-20 tokens?",
-    "What is BOT Chain testnet?",
+    "What is BOT Chain mainnet?",
 
     // Company & employee prompts
     "How many employees do we have?",

@@ -91,7 +91,7 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
-      // Simulate VAT calculation based on file - range between 1-10 PUSD
+      // Simulate VAT calculation based on file - range between 1-10 USDT
       setRefundAmount(Math.floor(Math.random() * 9) + 1);
     }
   };

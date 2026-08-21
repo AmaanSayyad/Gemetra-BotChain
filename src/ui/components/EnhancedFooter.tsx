@@ -181,13 +181,13 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                     <span className="text-sm">amaansayyad2001@gmail.com</span>
                   </a>
                   <a 
-                    href="https://www.palmusd.com/index.html" 
+                    href="https://www.botchain.ai/" 
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 transition-colors"
                   >
                     <Globe size={14} />
-                    <span className="text-sm">palmusd.com</span>
+                    <span className="text-sm">botchain.ai</span>
                   </a>
                 </div>
               </div>

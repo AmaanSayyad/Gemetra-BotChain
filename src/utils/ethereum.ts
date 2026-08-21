@@ -50,11 +50,6 @@ const GEMETRA_CORE_ABI = [
 ] as const;
 
 export const BOTCHAIN_USDT = BOTCHAIN_USDT_ADDRESS;
-/** @deprecated Use BOTCHAIN_USDT */
-export const PUSD_SOLANA_MINT = BOTCHAIN_USDT_ADDRESS;
-export const MNEE_CONTRACT_ADDRESS_MAINNET = BOTCHAIN_USDT_ADDRESS;
-export const USDT_SOLANA_MINT = BOTCHAIN_USDT_ADDRESS;
-export const PUSD_ETHEREUM_CONTRACT = BOTCHAIN_USDT_ADDRESS;
 
 export type PaymentToken = "USDT" | "BOT";
 
@@ -115,8 +110,7 @@ async function resolveSender(): Promise<Address> {
   return getAddress(wallet.account.address);
 }
 
-export const getPusdMintAddress = async (): Promise<string> => BOTCHAIN_USDT_ADDRESS;
-export const getMneeContractAddress = getPusdMintAddress;
+export const getUsdtTokenAddress = async (): Promise<string> => BOTCHAIN_USDT_ADDRESS;
 
 export async function getErc20BalanceUi(owner: string, token: Address, decimals: number): Promise<number> {
   try {
@@ -133,10 +127,8 @@ export async function getErc20BalanceUi(owner: string, token: Address, decimals:
   }
 }
 
-export const getPusdBalance = async (address?: string): Promise<number> =>
+export const getUsdtBalance = async (address?: string): Promise<number> =>
   getErc20BalanceUi(address ?? getConnectedAccount() ?? "", BOTCHAIN_USDT_ADDRESS, BOTCHAIN_USDT_DECIMALS);
-export const getMneeBalance = getPusdBalance;
-export const getUsdtBalance = getPusdBalance;
 
 function toTokenAmount(amount: number, token: PaymentToken): bigint {
   if (!amount || Number.isNaN(amount) || amount <= 0) {
@@ -195,13 +187,6 @@ export const sendPayment = async (
       error: error instanceof Error ? error.message : String(error),
     };
   }
-};
-
-export const sendMneePayment = async (
-  recipient: string,
-  amount: number
-): Promise<{ txHash: string; success: boolean; error?: string }> => {
-  return sendPayment(recipient, amount, "USDT");
 };
 
 export const sendBulkPayments = async (
@@ -304,28 +289,24 @@ export const sendBulkPayments = async (
   }
 };
 
-export const sendBulkMneePayments = async (
-  recipients: Array<{ address: string; amount: number }>
-) => sendBulkPayments(recipients, "USDT");
-
 export const getAccountBalance = async (
   address?: string
-): Promise<{ eth: number; mnee: number; usdt: number }> => {
+): Promise<{ eth: number; usdt: number }> => {
   try {
     const owner = address ?? getConnectedAccount() ?? "";
-    if (!owner || !isAddress(owner)) return { eth: 0, mnee: 0, usdt: 0 };
+    if (!owner || !isAddress(owner)) return { eth: 0, usdt: 0 };
     const target = getAddress(owner);
     const [native, usdt] = await Promise.all([
       publicClient.getBalance({ address: target }),
       getUsdtBalance(target),
     ]);
-    return { eth: Number(formatUnits(native, 18)), mnee: usdt, usdt };
+    return { eth: Number(formatUnits(native, 18)), usdt };
   } catch {
-    return { eth: 0, mnee: 0, usdt: 0 };
+    return { eth: 0, usdt: 0 };
   }
 };
 
-export const formatMnee = (amount: number): string => amount.toFixed(2);
+export const formatUsdt = (amount: number): string => amount.toFixed(2);
 export const formatEth = (amount: number): string => amount.toFixed(6);
 
 export async function recordVatRefundOnChain(opts: {

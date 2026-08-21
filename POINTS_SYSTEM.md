@@ -1,76 +1,97 @@
-# Points & rewards (Gemetra / USDT)
+# Points System
 
-## Overview
+Gemetra includes a lightweight points layer on top of payroll, scheduled payments, and VAT refunds. Points are tracked per **wallet** and surfaced in the top bar. Conversion is denominated as **USDT** on **BOT Chain**.
 
-Gemetra includes a lightweight points layer on top of payroll, scheduled payments, and VAT refunds. Points are tracked per **wallet** and surfaced in the top bar. Conversion is denominated as **USDT** in the UI (BOT Chain bridged USDT); some database columns and internal names still say **MNEE** as legacy labels.
+---
 
-**Payment token vs points:** Payroll, scheduled runs, and VAT refunds can record `payments.token` as **`USDT`** or **`BOT`** when you pick the token in the UI. Points earning rules are unchanged; **point conversion** still targets **USDT** (not BOT).
+## Flow
 
-Authoritative earning rules live in **`src/hooks/usePoints.ts`** (`POINTS_RULES`).
+```mermaid
+sequenceDiagram
+  actor User
+  participant UI as Gemetra UI
+  participant Pts as usePoints / localStorage
+  participant SB as Supabase
+  participant W as Wallet
+  participant U as USDT (BOT Chain)
 
-## Earning points
+  User->>UI: Complete payroll / VAT / scheduled payment
+  UI->>Pts: earnPoints(source)
+  Pts->>SB: upsert user_points + point_transactions
 
-| Action | Points | Where it fires |
-|--------|--------|----------------|
-| Single / one-recipient payroll payment | **10** | `PaymentPreviewModal.tsx` |
-| Bulk payroll (per employee paid) | **5 × employee count** | `PaymentPreviewModal.tsx` |
-| Scheduled batch run | **3 × number processed** | `ScheduledPayments.tsx` |
-| VAT refund (after on-chain succeeds) | **15** | `VATRefundPage.tsx` |
+  User->>UI: Convert points → USDT
+  UI->>Pts: convertPointsToUsdt(points, recipient?)
+  Pts->>W: getUsdtBalance / sendPayment(USDT)
+  alt Sufficient USDT in connected wallet
+    W->>U: ERC-20 transfer
+    Pts->>SB: point_conversions status=completed
+  else Insufficient balance
+    Pts->>SB: point_conversions status=pending (treasury)
+  end
+```
 
-Earning is **best-effort**: failures in the points hook do not block payments or VAT flows.
+---
 
-## Wallet identity (important)
+## Earning
 
-- `usePoints` resolves wallet identity from:
-  - `wagmi` address when connected, otherwise
-  - connected Solana wallet public key (`getConnectedAccount()`).
-- This keeps rewards visible for Solana-first sessions in payroll and VAT flows.
+Points are awarded for completed flows (see `POINTS_RULES` in `src/hooks/usePoints.ts`):
 
-LocalStorage keys mirror the resolved wallet address:
+| Source | Typical award |
+| --- | --- |
+| Single payment | +10 |
+| Bulk payroll (per employee factor) | +5 × count |
+| Scheduled payment | +3 |
+| VAT refund | +15 |
 
-- `gemetra_points_<address>`
-- `gemetra_point_transactions_<address>`
+---
 
-## Display & conversion
+## Conversion
 
-- **UI**: `PointsDisplay.tsx` (TopBar)—balance, conversion modal, transaction history shortcut.
-- **Rate**: **`100` points ⇒ `1` PUSD** (`CONVERSION_RATE` in `usePoints.ts`).
-- **Minimum convert**: **`100`** points.
-- Conversion path calls **`convertPointsToMnee`** (name kept); it computes PUSDamount, may call **`sendMneePayment`** (Solana SPL transfer helper in `ethereum.ts`) when balance allows, otherwise records **pending** (treasury/backend expected in production).
+- **Rate:** `100` points ⇒ `1` USDT (`CONVERSION_RATE` in `usePoints.ts`).  
+- **Path:** `convertPointsToUsdt` → `sendPayment(..., "USDT")` when the connected wallet holds enough USDT; otherwise records **pending** (treasury-backed fulfillment in production).  
+- Recipient defaults to the connected wallet; UI allows an alternate BOT Chain address.
 
-## Storage & Supabase
+---
 
-- **Primary**: browser **localStorage** (fast, offline-friendly).
-- **Secondary**: **`user_points`**, **`point_transactions`**, **`point_conversions`** via Supabase (upsert/insert in `earnPoints` / `convertPointsToMnee`). If Supabase rejects writes (RLS, schema), the app keeps working locally and logs errors—same pattern as payments.
+## Storage
 
-Schema is defined in **`supabase/migrations/20250612200000_points_system.sql`**:
+| Layer | Detail |
+| --- | --- |
+| Primary | `localStorage` keys `gemetra_points_*`, `gemetra_point_transactions_*` |
+| Secondary | Supabase `user_points`, `point_transactions`, `point_conversions` |
+| Legacy column | `mnee_amount` stores the **USDT** amount (historical column name) |
 
-| Table | Role |
-|-------|------|
-| `user_points` | `user_id` (text wallet), `total_points`, `lifetime_points`, timestamps |
-| `point_transactions` | Ledger: earned / converted / expired; `source` includes `payment`, `bulk_payment`, `scheduled_payment`, `vat_refund`, `conversion` |
-| `point_conversions` | One row per conversion; `mnee_amount` / naming is legacy—the UI presents **PUSD** |
+```mermaid
+erDiagram
+  USER_POINTS ||--o{ POINT_TRANSACTIONS : has
+  USER_POINTS ||--o{ POINT_CONVERSIONS : has
 
-RLS/policies for these tables must allow your client (typically **anon**) if you want cross-device sync; otherwise points stay device-local only.
+  USER_POINTS {
+    text user_id PK
+    int total_points
+    int lifetime_points
+  }
 
-## Technical notes
+  POINT_TRANSACTIONS {
+    text id PK
+    text user_id
+    int points
+    text source
+  }
 
-- `earnPoints` uses a **functional** localStorage update; Supabase totals in the upsert still read **`userPoints` from closure**—under heavy parallelism there can be a small drift versus local state; reruns/sync can be hardened later.
-- VAT refund points use the **Solana tx signature** as `source_id` when available.
-- Code comments in `usePoints` still say “MNEE” in places; behavior is **Solana PUSD** via `sendMneePayment` / `getMneeBalance` (PUSD mint).
+  POINT_CONVERSIONS {
+    text id PK
+    text user_id
+    int points
+    decimal mnee_amount
+    text status
+    text transaction_hash
+  }
+```
 
-## Testing checklist
+---
 
-1. Connect a supported wallet session (Solana wallet or wagmi-backed connection).  
-2. Single payment → **+10** points.  
-3. Bulk to 3 employees → **+15** points.  
-4. Run scheduled processor → **+3** per processed item.  
-5. Complete a VAT refund → **+15** points.  
-6. Convert **≥100** points → balance drops; check conversion status (completed vs pending) and console logs.
+## Future
 
-## Future enhancements
-
-- Continue consolidating points/session identity across wallet surfaces.  
-- Treasury-backed conversion with reliable on-chain PUSD delivery.  
-- Bonus tiers, referrals, expiry, achievements.  
-- Stronger Supabase + RLS story for multi-device points.
+- Dedicated treasury wallet for reliable USDT delivery on conversion.  
+- Optional on-chain points receipt via `logAgentAction` / dedicated events.

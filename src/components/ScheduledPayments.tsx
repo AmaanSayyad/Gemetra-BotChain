@@ -92,7 +92,7 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
   /** Token row being edited in the pre-approve modal */
   const [preApprovalToken, setPreApprovalToken] = useState<PaymentToken>('USDT');
 
-  // Load per-token pre-approval limits (migrates legacy single PUSD key)
+  // Load per-token pre-approval limits (USDT / BOT)
   useEffect(() => {
     if (!walletAddress) {
       setPreApprovalLimits(emptyPreApprovalLimits());
@@ -105,12 +105,8 @@ export const ScheduledPayments: React.FC<ScheduledPaymentsProps> = ({
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Record<PaymentToken, number | null>>;
         setPreApprovalLimits({
-          USDT: (parsed.USDT ?? (parsed as { PUSD?: number }).PUSD) != null && !Number.isNaN(Number(parsed.USDT ?? (parsed as { PUSD?: number }).PUSD))
-            ? Number(parsed.USDT ?? (parsed as { PUSD?: number }).PUSD)
-            : null,
-          BOT: (parsed.BOT ?? (parsed as { SOL?: number }).SOL) != null && !Number.isNaN(Number(parsed.BOT ?? (parsed as { SOL?: number }).SOL))
-            ? Number(parsed.BOT ?? (parsed as { SOL?: number }).SOL)
-            : null,
+          USDT: parsed.USDT != null && !Number.isNaN(Number(parsed.USDT)) ? Number(parsed.USDT) : null,
+          BOT: parsed.BOT != null && !Number.isNaN(Number(parsed.BOT)) ? Number(parsed.BOT) : null,
         });
         return;
       }

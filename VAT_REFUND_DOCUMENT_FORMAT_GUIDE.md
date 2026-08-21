@@ -1,5 +1,19 @@
 # VAT Refund Document Format Guide
 
+> Gemetra settles VAT refunds on **BOT Chain Mainnet** (chain ID **677**) in **USDT** or native **BOT**.  
+> Receiver wallets must be **EVM addresses**. On-chain: `GemetraCore.recordVatRefund` + settlement.
+
+```mermaid
+flowchart TD
+  A[Upload PDF/JPG/PNG receipt] --> B[Extract merchant · VAT · passport fields]
+  B --> C[Gemetra VAT form]
+  C --> D[Connect wallet on BOT Chain]
+  D --> E[Sign USDT/BOT payout]
+  E --> F[recordVatRefund + transfer/disburse]
+  F --> G[BOTScan tx + Supabase record]
+```
+
+---
 ## Best File Format Recommendation
 
 ### **PDF (Portable Document Format) - RECOMMENDED** ⭐
@@ -182,18 +196,18 @@ Please present at airport customs along with passport.
     "nationality": "United Kingdom",
     "dateOfBirth": "1987-05-23",
     "flightNumber": "EK205",
-    "walletAddress": "7YvC3Q8mAqW8sK9bDqzqY1vU3wL2aT5u9PcR1Zx8pJmK" 
+    "walletAddress": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0" 
   },
   "vatRefund": {
     "eligible": true,
     "refundAmount": 625.00,
     "refundCurrency": "AED",
     "convertedAmount": 170.00,
-    "convertedCurrency": "PUSD",
+    "convertedCurrency": "USDT",
     "exchangeRate": 3.6765,
-    "payoutNetwork": "solana-mainnet-beta",
-    "payoutToken": "PUSD",
-    "payoutMint": "CZzgUBvxaMLwMhVSLgqJn3npmxoTo6nzMNQPAnwtHF3s"
+    "payoutNetwork": "botchain-mainnet",
+    "payoutToken": "USDT",
+    "payoutContract": "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c"
   },
   "metadata": {
     "uploadDate": "2024-12-16T10:30:00Z",
@@ -205,13 +219,13 @@ Please present at airport customs along with passport.
 }
 ```
 
-### CSV Format (For Bulk Processing on Solana / PUSD)
+### CSV Format (For Bulk Processing on BOT Chain / USDT)
 
 ```csv
-Receipt Number,Merchant Name,VAT Reg No,Merchant Address,Purchase Date,Total Amount,Currency,VAT Amount,VAT Rate,Passport Number,Nationality,Flight Number,Receiver Solana Wallet Address,Payout Token,Refund Amount (PUSD)
-DXB-2024-084729,The Dubai Mall - Rolex Boutique,GB987654321,"Unit 206, The Dubai Mall, Financial Centre Road, Dubai, UAE",2024-12-15,12500.00,AED,625.00,5%,G12345678,United Kingdom,EK205,7YvC3Q8mAqW8sK9bDqzqY1vU3wL2aT5u9PcR1Zx8pJmK,PUSD,170.00
-LDN-2024-156892,Harrods Electronics Department,GB234567890,"87-135 Brompton Road, Knightsbridge, London SW1X 7XL, United Kingdom",2024-11-08,3450.00,GBP,575.00,20%,P7654321,United States,BA286,8Yuwr2V9vPjH6r4q1C9fQeL3tPmZ7xK5LqWtX2b4NsV,PUSD,156.50
-PAR-2024-092341,Galeries Lafayette - Champs-Élysées,FR12345678901,"40 Boulevard Haussmann, 75009 Paris, France",2024-10-22,2800.00,EUR,466.67,20%,M9876543,Canada,AF1234,9RkP7sT2wLmQ5yX8aNcV3hJ4eFsK1zD6UbQpW7r2XyS,PUSD,127.00
+Receipt Number,Merchant Name,VAT Reg No,Merchant Address,Purchase Date,Total Amount,Currency,VAT Amount,VAT Rate,Passport Number,Nationality,Flight Number,Receiver Wallet Address,Payout Token,Refund Amount (USDT)
+DXB-2024-084729,The Dubai Mall - Rolex Boutique,GB987654321,"Unit 206, The Dubai Mall, Financial Centre Road, Dubai, UAE",2024-12-15,12500.00,AED,625.00,5%,G12345678,United Kingdom,EK205,0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0,USDT,170.00
+LDN-2024-156892,Harrods Electronics Department,GB234567890,"87-135 Brompton Road, Knightsbridge, London SW1X 7XL, United Kingdom",2024-11-08,3450.00,GBP,575.00,20%,P7654321,United States,BA286,0x8ba1f109551bD432803012645Hac136c22C1759,USDT,156.50
+PAR-2024-092341,Galeries Lafayette - Champs-Élysées,FR12345678901,"40 Boulevard Haussmann, 75009 Paris, France",2024-10-22,2800.00,EUR,466.67,20%,M9876543,Canada,AF1234,0x1234567890123456789012345678901234567890,USDT,127.00
 ```
 
 ---

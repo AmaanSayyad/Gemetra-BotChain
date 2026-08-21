@@ -50,6 +50,7 @@ createAppKit({
     socials: [],
     onramp: false,
   },
+  enableWalletGuide: false,
   themeMode: "light",
   themeVariables: {
     "--w3m-accent": "#111827",

@@ -4,7 +4,7 @@ import {
   GEMETRA_APP_SNAPSHOT,
   buildGemetraSystemInstruction,
   buildGemetraUserContextBlock,
-  formatPusdInfoReply,
+  formatUsdtInfoReply,
   solanaTxExplorerUrl,
 } from "./gemetraAiFacts";
 import { BOT_CHAIN_ID, BOT_CHAIN_NAME } from "../config/botchain";
@@ -95,24 +95,18 @@ const analyzeMessage = (message: string): { topics: string[], entities: string[]
   if (/(name|called|title)/i.test(message)) topics.push('name');
   if (/(does|do|business|industry)/i.test(message)) topics.push('business_type');
   
-  /** Crypto / stablecoin ticker hints (includes legacy spellings mapped to pusd_info). */
+  /** Crypto / stablecoin ticker hints. */
   const cryptos =
     message.match(
-      /(ethereum|eth|mnee|mnée|bitcoin|btc|cardano|ada|solana|sol|pusd|palm.?usd|palmusd|stablecoin|usd.?backed)/gi
+      /(ethereum|eth|bitcoin|btc|cardano|ada|solana|sol|usdt|tether|stablecoin|usd.?backed)/gi
     ) || [];
   entities.push(...cryptos.map((c) => c.toLowerCase().replace(/\s+/g, "")));
 
   if (
-    /(pusd|palm\s*usd|palmusd|what.*pusd|tell.*pusd|explain.*pusd|\bpalm\b.*\busd\b)/i.test(message)
+    /(usdt|tether|what.*usdt|tell.*usdt|explain.*usdt)/i.test(message)
   ) {
-    entities.push("pusd");
-    topics.push("pusd_info");
-  }
-  if (
-    /(mnee|mnée|what is mnee|tell.*mnee|explain.*mnee)/i.test(message)
-  ) {
-    entities.push("mnee");
-    topics.push("pusd_info");
+    entities.push("usdt");
+    topics.push("usdt_info");
   }
   
   const people = message.match(/(founder|creator|ceo|vitalik|buterin)/gi) || [];
@@ -138,11 +132,11 @@ const updateThinkingContext = (message: string, analysis: any) => {
     thinkingContext.primaryCrypto = "bitcoin";
   } else if (analysis.entities.includes("ethereum") || analysis.entities.includes("eth")) {
     thinkingContext.primaryCrypto = "ethereum";
+  } else if (analysis.entities.includes("usdt") || analysis.entities.includes("tether")) {
+    thinkingContext.primaryCrypto = "usdt";
   } else if (
     analysis.entities.includes("solana") ||
     analysis.entities.includes("sol") ||
-    analysis.entities.includes("pusd") ||
-    analysis.entities.includes("mnee") ||
     analysis.topics.includes("ath") ||
     analysis.topics.includes("atl") ||
     analysis.topics.includes("pricing")
@@ -206,18 +200,17 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
   // Intelligent reasoning based on context
   
   if (
-    analysis.entities.includes("pusd") ||
-    analysis.entities.includes("mnee") ||
-    analysis.topics.includes("pusd_info") ||
-    /^pusd$/i.test(message.trim()) ||
-    /^palm\s*usd$/i.test(message.trim()) ||
-    /^what.*palm\s*usd/i.test(message.trim()) ||
-    /^what.*pusd/i.test(message.trim())
+    analysis.entities.includes("usdt") ||
+    analysis.entities.includes("tether") ||
+    analysis.topics.includes("usdt_info") ||
+    /^usdt$/i.test(message.trim()) ||
+    /^tether$/i.test(message.trim()) ||
+    /^what.*usdt/i.test(message.trim())
   ) {
     return {
       shouldAnswer: true,
-      directAnswer: "pusd_info",
-      reasoning: "User asking about USDT / USDT (or legacy MNEE wording) for this app.",
+      directAnswer: "usdt_info",
+      reasoning: "User asking about USDT for this app.",
     };
   }
 
@@ -226,14 +219,14 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
     if (raw === "eth" || raw === "ethereum") return "ethereum";
     if (raw === "btc" || raw === "bitcoin") return "bitcoin";
     if (raw === "ada" || raw === "cardano") return "cardano";
-    if (raw === "pusd" || raw === "mnee") return "palm-usd";
+    if (raw === "usdt" || raw === "tether") return "tether";
     return raw;
   };
 
   if (analysis.topics.includes("ath")) {
     let targetCrypto =
       analysis.entities.find((e) =>
-        ["bitcoin", "ethereum", "eth", "mnee", "pusd", "cardano", "solana", "sol"].includes(e)
+        ["bitcoin", "ethereum", "eth", "usdt", "tether", "cardano", "solana", "sol"].includes(e)
       ) || "solana";
     targetCrypto = normalizeAthAtlAsset(targetCrypto);
     thinkingContext.primaryCrypto = targetCrypto;
@@ -247,7 +240,7 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
   if (analysis.topics.includes("atl")) {
     let targetCrypto =
       analysis.entities.find((e) =>
-        ["bitcoin", "ethereum", "eth", "mnee", "pusd", "cardano", "solana", "sol"].includes(e)
+        ["bitcoin", "ethereum", "eth", "usdt", "tether", "cardano", "solana", "sol"].includes(e)
       ) || "solana";
     targetCrypto = normalizeAthAtlAsset(targetCrypto);
     thinkingContext.primaryCrypto = targetCrypto;
@@ -272,26 +265,26 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
   
   const pricePatterns = [
     /(current|what is|what's|tell me).*(price|pricing|cost|value).*(of|for)/i,
-    /price.*(of|for).*(ethereum|eth|bitcoin|btc|mnee|pusd|palm\s*usd|cardano|solana|sol)/i,
-    /(ethereum|eth|bitcoin|btc|mnee|pusd|palm\s*usd|cardano|solana|sol).*price/i,
-    /how much.*(ethereum|eth|bitcoin|btc|mnee|pusd|palm\s*usd|cardano|solana|sol)/i,
+    /price.*(of|for).*(ethereum|eth|bitcoin|btc|usdt|tether|cardano|solana|sol)/i,
+    /(ethereum|eth|bitcoin|btc|usdt|tether|cardano|solana|sol).*price/i,
+    /how much.*(ethereum|eth|bitcoin|btc|usdt|tether|cardano|solana|sol)/i,
   ];
 
   if (analysis.topics.includes("pricing") || pricePatterns.some((pattern) => pattern.test(message))) {
     let targetCrypto = analysis.entities.find((e) =>
-      ["bitcoin", "ethereum", "eth", "mnee", "pusd", "palmusd", "cardano", "solana", "sol"].includes(e)
+      ["bitcoin", "ethereum", "eth", "usdt", "tether", "cardano", "solana", "sol"].includes(e)
     );
 
     if (!targetCrypto) {
       const cryptoMatch = message.match(
-        /(ethereum|eth|bitcoin|btc|mnee|pusd|palm\s*usd|cardano|solana|\bsol\b)/i
+        /(ethereum|eth|bitcoin|btc|usdt|tether|cardano|solana|\bsol\b)/i
       );
       if (cryptoMatch) {
         targetCrypto = cryptoMatch[0].toLowerCase().replace(/\s+/g, "");
         if (targetCrypto === "eth") targetCrypto = "ethereum";
         if (targetCrypto === "sol") targetCrypto = "solana";
-        if (targetCrypto === "palmusd" || targetCrypto === "palmusd") {
-          targetCrypto = "pusd";
+        if (targetCrypto === "usdt" || targetCrypto === "tether") {
+          targetCrypto = "usdt";
         }
       }
     }
@@ -300,7 +293,7 @@ const intelligentThinking = (message: string): { shouldAnswer: boolean, directAn
     if (resolved === "sol") resolved = "solana";
     if (resolved === "eth") resolved = "ethereum";
     thinkingContext.primaryCrypto =
-      resolved === "pusd" || resolved === "mnee" ? "palm-usd" : resolved;
+      resolved === "usdt" || resolved === "tether" ? "tether" : resolved;
 
     console.log("💰 Price question detected:", {
       message,
@@ -390,12 +383,12 @@ const handleIntelligentQueries = async (message: string, context: AIContext): Pr
   
   console.log('🧠 Intelligent Analysis:', thinking);
   
-  if (thinking.directAnswer === "pusd_info") {
-    const pusdReply = formatPusdInfoReply();
+  if (thinking.directAnswer === "usdt_info") {
+    const usdtReply = formatUsdtInfoReply();
     thinkingContext.establishedFacts["payroll_stablecoin"] = "USDT on BOT Chain";
     thinkingContext.primaryCrypto = "solana";
-    addToMemory(message, pusdReply, "pusd_info");
-    return pusdReply;
+    addToMemory(message, usdtReply, "usdt_info");
+    return usdtReply;
   }
   
   // Then check for company intelligence questions
@@ -467,29 +460,29 @@ I can also answer product-grounded questions such as payroll totals, employee st
       case "price": {
         const priceAnalysis = analyzeMessage(message);
         let requestedCrypto = priceAnalysis.entities.find((e) =>
-          ["mnee", "pusd", "palmusd", "ethereum", "eth", "bitcoin", "btc", "cardano", "solana", "sol"].includes(
+          ["usdt", "tether", "ethereum", "eth", "bitcoin", "btc", "cardano", "solana", "sol"].includes(
             e
           )
         );
 
         if (!requestedCrypto) {
           const cryptoMatch = message.match(
-            /(ethereum|eth|bitcoin|btc|mnee|pusd|palm\s*usd|cardano|solana|\bsol\b)/i
+            /(ethereum|eth|bitcoin|btc|usdt|tether|cardano|solana|\bsol\b)/i
           );
           if (cryptoMatch) {
             requestedCrypto = cryptoMatch[0].toLowerCase().replace(/\s+/g, "");
             if (requestedCrypto === "eth") requestedCrypto = "ethereum";
             if (requestedCrypto === "sol") requestedCrypto = "solana";
-            if (requestedCrypto === "palmusd") requestedCrypto = "pusd";
+            if (requestedCrypto === "tether") requestedCrypto = "usdt";
           }
         }
 
         let inferred = requestedCrypto || thinkingContext.primaryCrypto || "solana";
-        if (inferred === "palm-usd") inferred = "pusd";
+        if (inferred === "tether") inferred = "usdt";
 
         const coingeckoId =
-          inferred === "pusd" || inferred === "mnee"
-            ? "palm-usd"
+          inferred === "usdt" || inferred === "tether"
+            ? "tether"
             : inferred === "sol" || inferred === "solana"
               ? "solana"
               : inferred;
@@ -500,17 +493,17 @@ I can also answer product-grounded questions such as payroll totals, employee st
         if (!priceData) break;
 
         let response: string;
-        if (coingeckoId === "palm-usd") {
+        if (coingeckoId === "tether") {
           const ch = priceData.change24h >= 0 ? "+" : "";
           response = `💵 **USDT (USDT)** — spot quote (aggregator)
 
 • **USD:** ~$${priceData.price.toFixed(4)} (stablecoins hug $1; small drift is normal)
 • **24h:** ${ch}${priceData.change24h.toFixed(3)}%
 
-**In Gemetra (BOT Chain testnet)**  
+**In Gemetra (BOT Chain)**  
 Mint: \`${GEMETRA_APP_SNAPSHOT.usdtAddress}\`  
 Explorer: ${GEMETRA_APP_SNAPSHOT.explorers.token}`;
-          thinkingContext.establishedFacts["pusd_reference_price"] = String(priceData.price);
+          thinkingContext.establishedFacts["usdt_reference_price"] = String(priceData.price);
         } else {
           response = formatPriceResponse(priceData, coingeckoId);
           thinkingContext.establishedFacts[`${coingeckoId}_price`] = priceData.price;
@@ -531,7 +524,7 @@ const fallbackResponses = {
   greeting: [
     "Hello! I'm your Gemetra assistant. I can summarize your payroll/employee context, clarify how **BOT Chain + USDT (USDT)** payouts work here, fetch live spot prices where available, and keep answers grounded to your company data.",
     "Hi — I'm your in-app analyst for Gemetra. Ask about employees, payments, or VAT-style flows; I explain **BOT Chain** settlements via the **wallet adapter** (MetaMask, Family, WalletConnect, etc.) and **USDT** without guessing protocol stats.",
-    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**BOT Chain testnet**, **USDT** or **BOT** payouts). What should we unpack?",
+    "Hey! I can use your onboarded employees/recent payouts plus the product rails (**BOT Chain mainnet**, **USDT** or **BOT** payouts). What should we unpack?",
   ],
   clarification: [
     "I want to give you the most accurate information! Could you clarify which specific aspect you're interested in? 🤔",
@@ -548,8 +541,8 @@ const fallbackResponses = {
 const getContextualFallback = (message: string): string => {
   const messageCount = conversationMemory.length;
 
-  if (/(pusd|palm\s*usd|mnee|mnée)/i.test(message)) {
-    return `${formatPusdInfoReply()}
+  if (/(usdt|tether)/i.test(message)) {
+    return `${formatUsdtInfoReply()}
 
 *(Gemini is offline or unavailable — this is canned product context.)*`;
   }
@@ -782,7 +775,7 @@ function tryGemetraDomainAnswer(
 1. From the dashboard shell, use **Connect wallet** in the **header** or **sidebar** (or the wallet control on the landing hero when offered).
 2. Choose a wallet in the **BOT Chain Wallet Adapter** modal (MetaMask, Family, WalletConnect, etc.). If you configured \`VITE_WALLETCONNECT_PROJECT_ID\`, **WalletConnect** appears for mobile / QR flows.
 3. Approve the connection in the wallet app or browser extension.
-4. Use **BOT Chain testnet** and keep a small **BOT** balance for network fees.
+4. Use **BOT Chain mainnet** and keep a small **BOT** balance for network fees.
 
 After you connect, **USDT** and **BOT** payouts are signed with that wallet in **Bulk transfer**, **VAT refund**, and **Scheduled payments** when you pick the token on each screen.`;
   }
@@ -792,7 +785,7 @@ After you connect, **USDT** and **BOT** payouts are signed with that wallet in *
 
 - Open **Scheduled payments** in the dashboard and create a **one-time** or **recurring** schedule (daily, weekly, bi-weekly, or monthly).
 - Set **amount**, **employee**, **date** (and **end date** for recurring), and the **token** (**USDT** or **BOT**). Each run uses the token stored on that schedule.
-- Optional **pre-approval**: set separate **spending caps per token** (USDT and SOL). While totals of due runs stay within those caps, the app can **auto-process** without asking you to sign again; otherwise you approve manually.
+- Optional **pre-approval**: set separate **spending caps per token** (USDT and BOT). While totals of due runs stay within those caps, the app can **auto-process** without asking you to sign again; otherwise you approve manually.
 - A background check looks for **due** items and processes them when your wallet is connected and balances cover the payout plus **BOT** fees.
 
 Use **Payments** / **Bulk transfer** for immediate batch sends outside the scheduler.`;
@@ -819,7 +812,7 @@ This Gemetra deployment settles on **${BOT_CHAIN_NAME}** (chain ID **${BOT_CHAIN
 Product snapshot: **${G.payrollChain}**.`;
   }
 
-  if (/(how (do|can) i|)send.*(token|pusd|sol).*solana/i.test(m) || /send tokens? on solana/i.test(m)) {
+  if (/(how (do|can) i|)send.*(token|usdt|bot).*bot.?chain/i.test(m) || /send tokens? on solana/i.test(m)) {
     return `### Sending tokens on BOT Chain (and in Gemetra)
 
 **In general:** fund **BOT** for gas, hold USDT for stable payouts, connect an EVM wallet, and send to a 0x address.
@@ -871,7 +864,7 @@ In Gemetra, a **bulk payment** is a **batch payroll send** from the **Bulk trans
 
 - You pick **one or many employees**, amounts, and the **token** (**USDT** or **BOT**).
 - The app shows a **preview** with totals, then asks your **BOT Chain wallet** to **sign** (often one transaction per recipient, depending on how the flow is built).
-- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **BOT Chain testnet**.
+- After confirmation, each row is stored as a **payment** with **status** and optional **transaction signature** on **BOT Chain mainnet**.
 
 It’s the opposite of paying people one-by-one manually off-platform: everything stays **in-app**, **wallet-signed**, and tied to your employee list.`;
   }

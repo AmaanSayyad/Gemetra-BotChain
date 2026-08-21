@@ -51,14 +51,11 @@ const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 const cryptoIds: { [key: string]: string } = {
   'ethereum': 'ethereum',
   'eth': 'ethereum',
-  'mnee': 'palm-usd',
-  'pusd': 'palm-usd',
-  'palm': 'palm-usd',
-  'palmusd': 'palm-usd',
   'bitcoin': 'bitcoin',
   'btc': 'bitcoin',
   'usdc': 'usd-coin',
   'usdt': 'tether',
+  'tether': 'tether',
   'bnb': 'binancecoin',
   'cardano': 'cardano',
   'ada': 'cardano',
@@ -323,7 +320,7 @@ export const getMarketSummary = async (): Promise<string> => {
     const cryptoNames: { [key: string]: string } = {
       'bitcoin': 'Bitcoin (BTC)',
       'ethereum': 'Ethereum (ETH)',
-      'palm-usd': 'Palm USD (PUSD)',
+      'tether': 'Tether (USDT)',
       'cardano': 'Cardano (ADA)',
       'solana': 'Solana (SOL)'
     };

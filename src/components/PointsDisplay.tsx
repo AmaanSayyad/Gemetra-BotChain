@@ -13,7 +13,7 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
   walletAddress,
   isWalletConnected
 }) => {
-  const { userPoints, transactions, convertPointsToMnee, conversionRate, loading } = usePoints();
+  const { userPoints, transactions, convertPointsToUsdt, conversionRate, loading } = usePoints();
   const [showConversionModal, setShowConversionModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [pointsToConvert, setPointsToConvert] = useState('');
@@ -23,7 +23,7 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
 
   const totalPoints = userPoints?.total_points || 0;
   const lifetimePoints = userPoints?.lifetime_points || 0;
-  const mneeEquivalent = totalPoints / conversionRate;
+  const usdtEquivalent = totalPoints / conversionRate;
 
   const handleConvert = async () => {
     if (!pointsToConvert || parseFloat(pointsToConvert) <= 0) {
@@ -53,13 +53,13 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
     setConversionError(null);
 
     try {
-      const result = await convertPointsToMnee(points, finalRecipientAddress);
+      const result = await convertPointsToUsdt(points, finalRecipientAddress);
       
       // Show success message with details
-      let successMessage = `✅ Successfully converted ${points} points to ${result.mneeAmount.toFixed(6)} USDT!\n\n` +
+      let successMessage = `✅ Successfully converted ${points} points to ${result.usdtAmount.toFixed(6)} USDT!\n\n` +
         `📊 Conversion Details:\n` +
         `• Points Converted: ${points}\n` +
-        `• USDT Amount: ${result.mneeAmount.toFixed(6)} USDT\n` +
+        `• USDT Amount: ${result.usdtAmount.toFixed(6)} USDT\n` +
         `• Remaining Points: ${result.remainingPoints}\n`;
       
       const recipient = recipientAddress.trim() || walletAddress;
@@ -71,7 +71,7 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
       } else if (result.transactionHash?.includes('pending')) {
         // Pending conversion (requires treasury wallet)
         successMessage += `\n⏳ Status: Pending\n` +
-          `💡 Note: In production, a treasury wallet would send ${result.mneeAmount.toFixed(6)} USDT to ${formatAddress(recipient)}.\n` +
+          `💡 Note: In production, a treasury wallet would send ${result.usdtAmount.toFixed(6)} USDT to ${formatAddress(recipient)}.\n` +
           `For this demo, the conversion has been recorded and will be processed.`;
       } else {
         // Conversion recorded but no transfer
@@ -154,7 +154,7 @@ export const PointsDisplay: React.FC<PointsDisplayProps> = ({
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-purple-700 font-medium">USDT Equivalent</p>
-                      <p className="text-2xl font-bold text-purple-900">{mneeEquivalent.toFixed(4)} USDT</p>
+                      <p className="text-2xl font-bold text-purple-900">{usdtEquivalent.toFixed(4)} USDT</p>
                     </div>
                   </div>
                 </div>

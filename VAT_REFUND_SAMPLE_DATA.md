@@ -1,4 +1,24 @@
-# VAT Refund Form - Sample Data
+# VAT Refund Form — Sample Data (BOT Chain)
+
+Sample claim payloads for Gemetra on **BOT Chain Mainnet**. Receiver addresses are **EVM (`0x…`)** wallets. Payouts settle in **USDT** (default) or native **BOT**.
+
+```mermaid
+sequenceDiagram
+  participant Form as VAT form / upload
+  participant App as Gemetra
+  participant Wallet as Payer wallet
+  participant Core as GemetraCore
+  participant Scan as BOTScan
+
+  Form->>App: Receipt + personal + merchant fields
+  App->>Wallet: Connect / sign USDT or BOT payout
+  Wallet->>Core: recordVatRefund(claimId, …)
+  Wallet->>Core: disburse / transfer
+  Core-->>Scan: VatRefundRecorded + Disbursed
+  App-->>Form: tx hash + explorer link
+```
+
+---
 
 ## Sample 1: Luxury Watch Purchase (Dubai)
 
@@ -8,8 +28,9 @@
 - **Total Bill Amount**: 12,500.00 AED
 - **VAT Amount**: 625.00 AED
 - **Purchase Date**: 15/12/2024
-- **Receiver Solana Wallet Address**: 7YvC3Q8mAqW8sK9bDqzqY1vU3wL2aT5u9PcR1Zx8pJmK
-- **Payout Token**: PUSD (Palm USD on Solana)
+- **Receiver Wallet Address**: `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0`
+- **Payout Token**: USDT (BOT Chain Mainnet)
+- **Refund Amount (USDT)**: 170.00
 
 ### Personal Information
 - **Passport Number**: G12345678
@@ -31,8 +52,9 @@
 - **Total Bill Amount**: 3,450.00 GBP
 - **VAT Amount**: 575.00 GBP
 - **Purchase Date**: 08/11/2024
-- **Receiver Solana Wallet Address**: 8Yuwr2V9vPjH6r4q1C9fQeL3tPmZ7xK5LqWtX2b4NsV
-- **Payout Token**: PUSD (Palm USD on Solana)
+- **Receiver Wallet Address**: `0x8ba1f109551bD432803012645Ac136c22C175900`
+- **Payout Token**: USDT (BOT Chain Mainnet)
+- **Refund Amount (USDT)**: 156.50
 
 ### Personal Information
 - **Passport Number**: P7654321
@@ -54,8 +76,9 @@
 - **Total Bill Amount**: 2,800.00 EUR
 - **VAT Amount**: 466.67 EUR
 - **Purchase Date**: 22/10/2024
-- **Receiver Solana Wallet Address**: 9RkP7sT2wLmQ5yX8aNcV3hJ4eFsK1zD6UbQpW7r2XyS
-- **Payout Token**: PUSD (Palm USD on Solana)
+- **Receiver Wallet Address**: `0x1234567890123456789012345678901234567890`
+- **Payout Token**: USDT (BOT Chain Mainnet)
+- **Refund Amount (USDT)**: 127.00
 
 ### Personal Information
 - **Passport Number**: M9876543
@@ -77,8 +100,9 @@
 - **Total Bill Amount**: 8,750.00 AED
 - **VAT Amount**: 437.50 AED
 - **Purchase Date**: 03/12/2024
-- **Receiver Solana Wallet Address**: 6LpV4qT7wDfN8hJ2kRsC5zX9vBmE1pY3uQoL6nT4aVg
-- **Payout Token**: PUSD (Palm USD on Solana)
+- **Receiver Wallet Address**: `0xabcdef1234567890abcdef1234567890abcdef12`
+- **Payout Token**: BOT (native) *or* USDT
+- **Refund Amount**: 119.00 (stable units if USDT)
 
 ### Personal Information
 - **Passport Number**: A12345678
@@ -100,8 +124,9 @@
 - **Total Bill Amount**: 1,950.00 EUR
 - **VAT Amount**: 390.00 EUR
 - **Purchase Date**: 18/09/2024
-- **Receiver Solana Wallet Address**: 5DqK7hW2xVmN9tR4cFgS8pL1zXyC3bH6kJnQ2wE8uTr
-- **Payout Token**: PUSD (Palm USD on Solana)
+- **Receiver Wallet Address**: `0x562d89c9709B5F51dDAcABafC8e0e7A074186428`
+- **Payout Token**: USDT (BOT Chain Mainnet)
+- **Refund Amount (USDT)**: 106.00
 
 ### Personal Information
 - **Passport Number**: C8765432
@@ -115,30 +140,16 @@
 
 ---
 
-## Notes:
-- All receiver wallet addresses are **example Solana mainnet addresses** (Base58, no `0x` prefix).
-- VAT amounts are calculated at standard rates (5% for UAE, 20% for UK, 20% for France, 22% for Italy).
-- Dates are in dd/mm/yyyy format.
-- Passport numbers follow realistic formats for each country.
-- Flight numbers use real airline codes (EK=Emirates, BA=British Airways, AF=Air France, QR=Qatar Airways, LH=Lufthansa).
-- Merchant names and addresses are realistic for major shopping destinations.
+## Notes
 
----
+- Receiver addresses must be valid **BOT Chain / EVM** addresses (`0x` + 40 hex).  
+- On-chain registry: `GemetraCore.recordVatRefund` · settlement: `disburse` / ERC-20 `transfer`.  
+- USDT mainnet: `0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c`.  
+- VAT rates illustrated: UAE 5%, UK/FR 20%, IT 22%.  
+- Verify payouts on [BOTScan](https://scan.botchain.ai).
 
-## File Format Recommendations
+## See also
 
-### Best Format: PDF ⭐
-- **Why**: Structured, OCR-friendly, tamper-resistant, professional
-- **Specs**: PDF 1.7+, 300 DPI minimum, searchable text
-- **Size**: Max 10 MB
-
-### Acceptable Formats: JPG, PNG
-- **Why**: Quick mobile uploads, easy to capture
-- **Specs**: 1200x1600 pixels minimum, high quality
-- **Size**: Max 5 MB
-
-### See Also:
-- **Document Format Guide**: `VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md`
-- **JSON Sample**: `samples/vat_receipt_sample.json`
-- **CSV Bulk Format**: `samples/vat_receipts_bulk.csv`
-- **Receipt Template**: `samples/receipt_template.txt`
+- [VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md](./VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md)  
+- `samples/vat_receipt_sample.json`  
+- `samples/vat_receipts_bulk.csv`  

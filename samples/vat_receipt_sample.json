@@ -69,7 +69,7 @@
     "refundAmount": 625.00,
     "refundCurrency": "AED",
     "convertedAmount": 170.00,
-    "convertedCurrency": "MNEE",
+    "convertedCurrency": "USDT",
     "exchangeRate": 3.6765,
     "exchangeRateDate": "2024-12-16",
     "processingFee": 0.00,
@@ -111,9 +111,9 @@
     ]
   },
   "blockchain": {
-    "network": "ethereum",
-    "chainId": 1,
-    "token": "MNEE",
+    "network": "BOT Chain",
+    "chainId": 677,
+    "token": "USDT",
     "tokenAddress": "0x...",
     "transactionHash": null,
     "blockNumber": null,

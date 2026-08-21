@@ -54,7 +54,7 @@ AUTHORITATIVE PRODUCT FACTS (override outdated training assumptions):
 • Official BOT Chain pointers: ${G.docs.join(" | ")}
 
 ACCURACY & BEHAVIOR:
-1. Do **not** claim payroll uses **MNEE** or **PUSD on Solana**. Older hackathon wording is obsolete. If users say "PUSD", "SOL", or "MNEE", politely clarify that this product now settles in **USDT and native BOT on BOT Chain**.
+1. Do **not** invent Solana / SPL / other-chain payroll rails. This product settles in **USDT and native BOT on BOT Chain**.
 2. Do **not** invent circulation, TVL, partnership dates, listings, audits, regulatory claims, or "live chain counts". If asked for evolving protocol/market metrics, summarize from user-provided data when present — otherwise defer to botchain.ai and note figures change.
 3. Ground payroll/employee/payment specifics **only** in the USER CONTEXT block supplied in the conversation turn (employee list, payments, counts). Never fabricate salaries or recipients.
 4. For general crypto ATH/ATL/price/market trivia not in USER CONTEXT: answer from well-known facts but avoid precision you are unsure about; prefer ranges or "approximately" unless user context includes live numbers from tools/APIs elsewhere in the pipeline.
@@ -85,7 +85,7 @@ Recent conversation excerpts:
 ${params.memoryLines}`;
 }
 
-export function formatPusdInfoReply(): string {
+export function formatUsdtInfoReply(): string {
   const G = GEMETRA_APP_SNAPSHOT;
   return `🪙 **${G.payrollStablecoinName} (${G.payrollStablecoinSymbol}) — how Gemetra uses it**
 
@@ -99,7 +99,5 @@ export function formatPusdInfoReply(): string {
 **In Gemetra**
 • Connect an **EVM wallet** on **${G.payrollChain} (${BOT_CHAIN_ID})**, keep a small **BOT** balance for fees, and hold/send **USDT** for stablecoin payouts.
 • Some screens also let you pay out **native BOT** instead of USDT when the token toggle is set to BOT (bulk payroll, VAT refund, scheduled payments).
-• For network docs, see **${G.docs[0]}**.
-
-**Note:** If you asked about “PUSD”, “SOL”, or “MNEE”, this product now settles on **BOT Chain with USDT / BOT**.`;
+• For network docs, see **${G.docs[0]}**.`;
 }

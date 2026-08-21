@@ -166,6 +166,7 @@ export interface PointConversion {
   id: string;
   user_id: string;
   points: number;
+  /** USDT amount; column name is legacy in Supabase */
   mnee_amount: number;
   conversion_rate: number;
   transaction_hash?: string;

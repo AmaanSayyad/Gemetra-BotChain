@@ -208,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
                       )}
                     </div>
                   ) : (
-                    <ConnectButton/>
+                    <ConnectButton variant="account" />
                   )}
 
                   
@@ -346,7 +346,7 @@ export const Header: React.FC<HeaderProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <ConnectButton/>
+                      <ConnectButton variant="account" />
                     )}
                     <button
                       onClick={handleSignOut}

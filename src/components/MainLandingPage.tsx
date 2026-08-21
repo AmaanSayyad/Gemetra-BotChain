@@ -45,7 +45,7 @@ function GemetraLandingPage() {
               alt="BOT Chain logo"
               className="h-4 w-4 shrink-0 object-contain sm:h-5 sm:w-5"
             />
-            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on BOT CHAIN TESTNET</span>
+            <span className="font-['Montserrat'] text-xs font-[700] text-brand-800 sm:text-[14px]">Built on BOT CHAIN MAINNET</span>
             <img
               src="/usdt.png"
               alt="USDT logo"
@@ -67,25 +67,30 @@ function GemetraLandingPage() {
           </span>
         </div>
         <div className="z-10 flex w-full min-w-0 flex-wrap items-center justify-center gap-3 sm:gap-6">
-          <ConnectButton />
           <Button
             size="large"
             variant="primary"
-            onClick={() => window.open('https://youtu.be/U1QJ2HDRRQE', '_blank')}
-            icon={<Play size={20} />}
+            onClick={() =>
+              document.getElementById("features-section")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              })
+            }
+            icon={<ArrowRight size={20} />}
             className="px-8 py-6 bg-brand-600 hover:bg-brand-700 text-white transition-all duration-300"
           >
-            Watch Demo
+            Explore Platform
           </Button>
           <Button
             size="large"
             variant="neutral-secondary"
-            onClick={() => window.open('https://docs.google.com/presentation/d/1trAcKhid7PlEzjvimu0vB0suMvGEKcSRTfVbtFiwc4A/edit?usp=sharing', '_blank')}
-            icon={<ArrowRight size={20} />}
+            onClick={() => window.open('https://youtu.be/U1QJ2HDRRQE', '_blank')}
+            icon={<Play size={20} />}
             className="px-8 py-6 hover:bg-brand-50 transition-all duration-300"
           >
-            Learn More
+            Watch Demo
           </Button>
+          <ConnectButton />
         </div>
 
         {/* Stats Bar */}
@@ -155,7 +160,7 @@ function GemetraLandingPage() {
               Built on BOT Chain with USDT for programmable money, secure transactions, and transparent payroll automation.
             </p>
             <div className="flex flex-wrap gap-2 mt-auto">
-              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Testnet</span>
+              <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">BOT Chain Mainnet</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">USDT</span>
               <span className="px-3 py-1 bg-brand-50 rounded-full text-sm font-medium text-brand-800">ERC-20 Token Standard</span>
             </div>

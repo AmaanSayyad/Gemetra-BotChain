@@ -11,7 +11,7 @@ import { supabase } from "../lib/supabase";
 import type { UserPoints, PointTransaction, PointConversion } from "../lib/supabase";
 import { useAccount } from "wagmi";
 import { usePhantomPublicKey } from "./usePhantomPublicKey";
-import { sendMneePayment, getConnectedAccount, getMneeBalance } from "../utils/ethereum";
+import { sendPayment, getConnectedAccount, getUsdtBalance } from "../utils/ethereum";
 
 function generateUUID() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -229,7 +229,7 @@ function usePointsState() {
     [walletAddress, readPointsFromStorage],
   );
 
-  const convertPointsToMnee = useCallback(
+  const convertPointsToUsdt = useCallback(
     async (pointsToConvert: number, recipientAddress?: string) => {
       if (!walletAddress) {
         throw new Error("Wallet not connected");
@@ -249,13 +249,13 @@ function usePointsState() {
       try {
         setLoading(true);
 
-        const mneeAmount = pointsToConvert / CONVERSION_RATE;
+        const usdtAmount = pointsToConvert / CONVERSION_RATE;
 
         const conversion: PointConversion = {
           id: generateUUID(),
           user_id: walletAddress,
           points: pointsToConvert,
-          mnee_amount: mneeAmount,
+          mnee_amount: usdtAmount, // Supabase column name (stores USDT amount)
           conversion_rate: CONVERSION_RATE,
           status: "pending",
           created_at: new Date().toISOString(),
@@ -265,27 +265,31 @@ function usePointsState() {
         let conversionStatus: "pending" | "completed" | "failed" = "pending";
 
         try {
-          const userBalance = await getMneeBalance(walletAddress);
+          const userBalance = await getUsdtBalance(walletAddress);
 
-          if (userBalance >= mneeAmount) {
-            console.log(`💰 Sending ${mneeAmount} MNEE to ${finalRecipientAddress}...`);
+          if (userBalance >= usdtAmount) {
+            console.log(`💰 Sending ${usdtAmount} USDT to ${finalRecipientAddress}...`);
 
-            const transferResult = await sendMneePayment(finalRecipientAddress as `0x${string}`, mneeAmount);
+            const transferResult = await sendPayment(
+              finalRecipientAddress as `0x${string}`,
+              usdtAmount,
+              "USDT",
+            );
 
             if (transferResult.success && transferResult.txHash) {
               actualTxHash = transferResult.txHash;
               conversionStatus = "completed";
-              console.log(`✅ MNEE tokens sent! Transaction: ${actualTxHash}`);
+              console.log(`✅ USDT tokens sent! Transaction: ${actualTxHash}`);
             } else {
               conversionStatus = "failed";
-              console.error("Failed to send MNEE tokens:", transferResult.error);
+              console.error("Failed to send USDT tokens:", transferResult.error);
             }
           } else {
-            console.log("⚠️ User wallet does not have sufficient MNEE balance.");
+            console.log("⚠️ User wallet does not have sufficient USDT balance.");
             conversionStatus = "pending";
           }
         } catch (transferError) {
-          console.error("Error attempting MNEE transfer:", transferError);
+          console.error("Error attempting USDT transfer:", transferError);
           conversionStatus = "pending";
         }
 
@@ -308,7 +312,7 @@ function usePointsState() {
           transaction_type: "converted",
           source: "conversion",
           source_id: conversion.id,
-          description: `Converted ${pointsToConvert} points to ${mneeAmount.toFixed(6)} MNEE`,
+          description: `Converted ${pointsToConvert} points to ${usdtAmount.toFixed(6)} USDT`,
           created_at: new Date().toISOString(),
         };
 
@@ -347,12 +351,12 @@ function usePointsState() {
           console.error("Failed to save conversion to Supabase:", supabaseError);
         }
 
-        console.log(`✅ Converted ${pointsToConvert} points to ${mneeAmount.toFixed(6)} MNEE (Status: ${conversionStatus})`);
+        console.log(`✅ Converted ${pointsToConvert} points to ${usdtAmount.toFixed(6)} USDT (Status: ${conversionStatus})`);
 
         const after = readPointsFromStorage();
         return {
           conversion,
-          mneeAmount,
+          usdtAmount,
           remainingPoints: after?.total_points ?? balanceBefore - pointsToConvert,
           transactionHash: actualTxHash || conversion.transaction_hash,
           status: conversionStatus,
@@ -392,7 +396,7 @@ function usePointsState() {
     loading,
     error,
     earnPoints,
-    convertPointsToMnee,
+    convertPointsToUsdt,
     getPointsForPayment,
     conversionRate: CONVERSION_RATE,
     pointsRules: POINTS_RULES,

@@ -5,6 +5,8 @@ const FORBIDDEN = [
   /\bSolscan\b/i,
   /\bPUSD\b/,
   /\bPalm USD\b/i,
+  /palmusd/i,
+  /\bMNEE\b/i,
   /\bPhantom\b/i,
   /\bSolflare\b/i,
   /\bSPL Token\b/i,
@@ -45,12 +47,12 @@ test.describe("Gemetra frontend", () => {
     }
   });
 
-  test("footer points at BOT Chain, not Palm USD", async ({ page }) => {
+  test("footer points at BOT Chain, not PalmUSD", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     const footer = page.locator("footer").first();
     if (await footer.count()) {
       const text = await footer.innerText();
-      expect(text).not.toMatch(/Palm USD/i);
+      expect(text).not.toMatch(/Palm USD|palmusd|PUSD|MNEE/i);
       expect(text).not.toMatch(/\bSolana\b/i);
       expect(text).toMatch(/BOT Chain/i);
     }

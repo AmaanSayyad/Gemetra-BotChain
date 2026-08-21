@@ -141,7 +141,7 @@ export const detectIntent = (text: string): {
     'price_query': ['price', 'cost', 'value', 'current', 'live', 'real-time', 'market cap', 'worth'],
     'greeting': ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'greetings', 'how are you'],
     'company_analysis': ['company', 'business', 'overview', 'summary', 'analysis', 'employee', 'department'],
-    'blockchain_query': ['blockchain', 'ethereum', 'mnee', 'crypto', 'consensus', 'transaction', 'fees'],
+    'blockchain_query': ['blockchain', 'ethereum', 'usdt', 'crypto', 'consensus', 'transaction', 'fees'],
     'payment_query': ['payment', 'transaction', 'transfer', 'send', 'receive', 'money'],
     'employee_query': ['employee', 'worker', 'staff', 'team', 'salary', 'compensation'],
     'market_query': ['market', 'trading', 'volume', 'rank', 'cap', 'summary']

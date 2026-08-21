@@ -592,7 +592,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
                 </div>
-                <ConnectButton />
+                <ConnectButton variant="account" />
                 {user && (
                   <button
                     onClick={handleSignOut}
