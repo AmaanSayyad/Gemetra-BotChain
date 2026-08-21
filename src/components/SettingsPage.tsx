@@ -529,13 +529,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                       <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-auto" />
                     </a>
                     <a
-                      href="https://docs.google.com/presentation/d/1trAcKhid7PlEzjvimu0vB0suMvGEKcSRTfVbtFiwc4A/edit?usp=sharing"
+                      href="https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex items-center space-x-2 px-2 py-2 sm:px-3 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                       <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span>Documentation</span>
+                      <span>Pitch Deck</span>
                       <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 ml-auto" />
                     </a>
                   </div>

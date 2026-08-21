@@ -150,8 +150,8 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                     <span>Demo Video</span>
                     <ExternalLink size={12} />
                   </a>
-                  <a href="https://docs.google.com/presentation/d/1trAcKhid7PlEzjvimu0vB0suMvGEKcSRTfVbtFiwc4A/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
-                    <span>Documentation</span>
+                  <a href="https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
+                    <span>Pitch Deck</span>
                     <ExternalLink size={12} />
                   </a>
                   <a href="https://dev-docs.botchain.ai/docs/Developers/quick-guide/" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">

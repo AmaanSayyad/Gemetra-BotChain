@@ -1177,11 +1177,11 @@ function GemetraLandingPage() {
             <Button
               size="large"
               variant="neutral-secondary"
-              onClick={() => window.open('https://docs.google.com/presentation/d/1trAcKhid7PlEzjvimu0vB0suMvGEKcSRTfVbtFiwc4A/edit?usp=sharing', '_blank')}
+              onClick={() => window.open('https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing', '_blank')}
               icon={<ArrowRight size={20} />}
               className="px-10 py-6 hover:bg-brand-50 transition-all duration-300 text-lg"
             >
-              Read Documentation
+              View Pitch Deck
             </Button>
           </div>
 

@@ -8,6 +8,7 @@
 | **Live demo** | https://gemetra-botchain-ten.vercel.app |
 | **GitHub** | https://github.com/AmaanSayyad/Gemetra-BotChain |
 | **Demo video** | https://youtu.be/U1QJ2HDRRQE |
+| **Pitch deck** | https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing |
 | **Explorer (GemetraCore)** | https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2 |
 | **Challenge brief** | [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) |
 
