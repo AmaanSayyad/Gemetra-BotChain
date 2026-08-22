@@ -34,3 +34,42 @@ export function getVatRefundPaymentsFromBrowserLocalStorage(): Payment[] {
     (p) => p.employee_id === "vat-refund",
   );
 }
+
+/** Remove all VAT refund rows from every `gemetra_payments_*` bucket in this browser. */
+export function clearVatRefundPaymentsFromBrowserLocalStorage(): number {
+  if (typeof localStorage === "undefined") return 0;
+
+  let removed = 0;
+  const keysToUpdate: Array<{ key: string; next: Payment[] }> = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith(STORAGE_PREFIX)) continue;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) continue;
+      const kept: Payment[] = [];
+      for (const row of parsed) {
+        const p = row as Payment;
+        if (p?.employee_id === "vat-refund") {
+          removed++;
+        } else if (p?.id) {
+          kept.push(p);
+        }
+      }
+      if (kept.length !== parsed.length) {
+        keysToUpdate.push({ key, next: kept });
+      }
+    } catch {
+      /* ignore corrupt buckets */
+    }
+  }
+
+  for (const { key, next } of keysToUpdate) {
+    localStorage.setItem(key, JSON.stringify(next));
+  }
+
+  return removed;
+}

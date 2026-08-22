@@ -4,6 +4,8 @@ import { explorerTxUrl } from "../config/botchain";
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY";
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID";
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "YOUR_TEMPLATE_ID";
+const PAYMENT_NOTIFICATION_EMAIL =
+  import.meta.env.VITE_PAYMENT_NOTIFICATION_EMAIL || "0xamaan.dev@gmail.com";
 
 // Initialize EmailJS
 emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -20,48 +22,47 @@ export interface PaymentEmailData {
 
 export const sendPaymentEmail = async (emailData: PaymentEmailData): Promise<boolean> => {
   try {
-    // Validate employee email
-    if (!emailData.employeeEmail || !emailData.employeeEmail.includes('@')) {
-      console.error(`Invalid employee email: ${emailData.employeeEmail}`);
+    const recipientEmail = PAYMENT_NOTIFICATION_EMAIL;
+    if (!recipientEmail.includes("@")) {
+      console.error(`Invalid payment notification email: ${recipientEmail}`);
       return false;
     }
 
     // Prepare template parameters for EmailJS
     // IMPORTANT: Your EmailJS template must use {{to_email}} as the recipient field
-    // Make sure your template has "to_email" set as the recipient, not a hardcoded email
     const templateParams = {
-      to_name: emailData.employeeName,
-      to_email: emailData.employeeEmail, // This should be used as recipient in EmailJS template
-      reply_to: emailData.employeeEmail, // Also set reply-to to employee email
+      to_name: "Gemetra Admin",
+      to_email: recipientEmail,
+      reply_to: recipientEmail,
       from_name: emailData.companyName,
-      subject: `Payment Notification: ${emailData.amount.toLocaleString()} ${emailData.token} from ${emailData.companyName}`,
-      message: `Dear ${emailData.employeeName},
+      subject: `Payment completed: ${emailData.amount.toLocaleString()} ${emailData.token} to ${emailData.employeeName}`,
+      message: `Payment completed on Gemetra.
 
-Your payment of ${emailData.amount.toLocaleString()} ${emailData.token} has been successfully processed.
+Recipient: ${emailData.employeeName}${emailData.employeeEmail ? ` (${emailData.employeeEmail})` : ""}
 
 Payment Details:
 - Amount: ${emailData.amount.toLocaleString()} ${emailData.token}
 - Date: ${emailData.paymentDate}
 - Company: ${emailData.companyName}
-${emailData.transactionHash ? `- Transaction Hash: ${emailData.transactionHash}` : ''}
-${emailData.transactionHash ? `- View on BOTScan: ${explorerTxUrl(emailData.transactionHash)}` : ''}
+${emailData.transactionHash ? `- Transaction Hash: ${emailData.transactionHash}` : ""}
+${emailData.transactionHash ? `- View on BOTScan: ${explorerTxUrl(emailData.transactionHash)}` : ""}
 
-Thank you for your service.
-
-Best regards,
-${emailData.companyName} Team`,
+This is an automated payment confirmation from Gemetra.`,
       amount: emailData.amount.toLocaleString(),
       token: emailData.token,
-      transaction_hash: emailData.transactionHash || 'N/A',
+      transaction_hash: emailData.transactionHash || "N/A",
       payment_date: emailData.paymentDate,
       company_name: emailData.companyName,
-      explorer_link: emailData.transactionHash 
+      employee_name: emailData.employeeName,
+      employee_email: emailData.employeeEmail || "N/A",
+      explorer_link: emailData.transactionHash
         ? explorerTxUrl(emailData.transactionHash)
-        : 'N/A'
+        : "N/A",
     };
 
-    console.log(`📧 Sending payment email to ${emailData.employeeEmail} for ${emailData.employeeName}`);
-    console.log('Email template params:', templateParams);
+    console.log(
+      `📧 Sending payment notification to ${recipientEmail} for ${emailData.employeeName}`
+    );
 
     // Send email using EmailJS
     // NOTE: Your EmailJS template MUST have "to_email" configured as the recipient field
@@ -73,7 +74,7 @@ ${emailData.companyName} Team`,
       templateParams
     );
 
-    console.log(`✅ Email sent successfully to ${emailData.employeeEmail}:`, response);
+    console.log(`✅ Payment notification sent to ${recipientEmail}:`, response);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);

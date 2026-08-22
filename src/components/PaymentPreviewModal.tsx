@@ -178,7 +178,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
           // Continue with success flow even if database recording fails
         }
 
-        // Send email notifications to each employee with their own transaction hash
+        // Send payment-done notifications to the configured admin email
         let emailResults = { success: 0, failed: 0 };
         try {
           const emailDataList: PaymentEmailData[] = employeesToPay.map(employee => {
@@ -628,7 +628,7 @@ export const PaymentPreviewModal: React.FC<PaymentPreviewModalProps> = ({
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="text-xs text-yellow-800">
                 <strong>Important:</strong> Once confirmed, this transaction cannot be reversed. 
-                Please verify all recipient addresses and amounts before proceeding. Email notifications will be sent to employees automatically.
+                Please verify all recipient addresses and amounts before proceeding. A payment confirmation email will be sent to the configured notification address.
               </div>
             </div>
           )}

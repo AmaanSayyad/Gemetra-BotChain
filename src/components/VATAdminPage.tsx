@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, CheckCircle, Clock, AlertCircle, Search, Download, ExternalLink, FileText, User, Calendar, DollarSign } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Payment } from '../lib/supabase';
-import { getVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserStoredPayments';
+import { getVatRefundPaymentsFromBrowserLocalStorage, clearVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserStoredPayments';
 import { TOKEN_LOGOS, tokenLogoSrc } from '../constants/tokenLogos';
 import { explorerTxUrl } from '../config/botchain';
 
@@ -86,10 +86,9 @@ export const VATAdminPage: React.FC = () => {
   });
   const [selectedRefund, setSelectedRefund] = useState<VATRefundAdmin | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
-  // Supabase + same localStorage buckets the VAT Refund "History" tab uses (fixes empty admin when remote upsert fails)
-  useEffect(() => {
-    const fetchAllVATRefunds = async () => {
+  const fetchAllVATRefunds = async () => {
       try {
         setIsLoading(true);
 
@@ -153,8 +152,40 @@ export const VATAdminPage: React.FC = () => {
       } finally {
         setIsLoading(false);
       }
-    };
+  };
 
+  const handleClearAllRefunds = async () => {
+    if (!window.confirm('Delete all VAT refund entries from Supabase and this browser? This cannot be undone.')) {
+      return;
+    }
+
+    setIsClearing(true);
+    try {
+      const { error } = await supabase
+        .from('payments')
+        .delete()
+        .eq('employee_id', 'vat-refund');
+
+      if (error) {
+        console.error('Failed to delete VAT refunds from Supabase:', error);
+        setBlendNotice({
+          tone: 'warning',
+          text: `Could not delete from Supabase (${error.message}). Cleared browser cache only.`,
+        });
+      } else {
+        setBlendNotice(null);
+      }
+
+      const removedLocal = clearVatRefundPaymentsFromBrowserLocalStorage();
+      console.log(`Cleared ${removedLocal} local VAT refund row(s)`);
+      await fetchAllVATRefunds();
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  // Supabase + same localStorage buckets the VAT Refund "History" tab uses (fixes empty admin when remote upsert fails)
+  useEffect(() => {
     fetchAllVATRefunds();
 
     const interval = setInterval(() => {
@@ -272,13 +303,22 @@ export const VATAdminPage: React.FC = () => {
               <p className="text-sm text-gray-600 break-words">Dubai Government VAT Administration</p>
             </div>
           </div>
-          <button
-            onClick={exportToCSV}
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto shrink-0 bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl"
-          >
-            <Download className="w-5 h-5" />
-            Export CSV
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
+            <button
+              onClick={handleClearAllRefunds}
+              disabled={isClearing || (refunds.length === 0 && !isLoading)}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl"
+            >
+              {isClearing ? 'Clearing…' : 'Clear All'}
+            </button>
+            <button
+              onClick={exportToCSV}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2.5 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl"
+            >
+              <Download className="w-5 h-5" />
+              Export CSV
+            </button>
+          </div>
         </div>
 
         {blendNotice ? (
