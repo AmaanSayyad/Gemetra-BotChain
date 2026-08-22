@@ -250,6 +250,7 @@ pnpm deploy:core
 | Doc | Purpose |
 | --- | --- |
 | [CHALLENGE_SUBMISSION.md](./CHALLENGE_SUBMISSION.md) | RWA track checklist & migration answers |
+| [Challenge submission Q&A](#challenge-submission-qa) | Full form answers (overview, deployment, growth) |
 | [VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md](./VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md) | Receipt / claim document formats |
 | [VAT_REFUND_SAMPLE_DATA.md](./VAT_REFUND_SAMPLE_DATA.md) | Sample VAT claim payloads |
 | [POINTS_SYSTEM.md](./POINTS_SYSTEM.md) | RWA engagement points on settlements |
@@ -257,11 +258,114 @@ pnpm deploy:core
 
 ---
 
-## Why BOT Chain (migration)
+Growth focus: tourist VAT corridors + SME wage runs on BOT mainnet — see [Challenge submission Q&A](#challenge-submission-qa) below.
 
-Gemetra moved settlement to BOT Chain to run **RWA remittance** (VAT reclaim + wage distribution) on an EVM mainnet with USDT rails, custody-free `GemetraCore`, and BOTScan-verifiable claim/payrun evidence—not a superficial redeploy.
+---
 
-Growth focus: tourist VAT corridors + SME wage runs on BOT mainnet (see challenge doc).
+## Challenge submission Q&A
+
+Answers for BOT Builder Challenge #2 (RWA track).
+
+### Project overview
+
+**What problem does your project solve? How does it work? Who are the target users?**
+
+Gemetra solves a real remittance gap: **tourists lose billions in unclaimed VAT refunds** because airport kiosks, paperwork, and slow bank rails make it easy to miss a claim before a flight, while **employers** struggle with costly, slow cross-border wage payouts.
+
+Gemetra is an **RWA settlement app on BOT Chain Mainnet**. Tourist VAT reclaim claims and payroll wage obligations are captured in the app, then closed with wallet-signed **USDT or native BOT** transfers. `GemetraCore` records VAT claims on-chain (`recordVatRefund`) and batches wage payouts (`disburse`) without taking custody of funds. Each flow produces **BOTScan-verifiable** transaction proof, with claim and payrun metadata mirrored in Supabase for audit.
+
+**How it works:** An operator connects an EVM wallet (MetaMask, BO Wallet, or WalletConnect) on chain **677**. For VAT, they submit claim and receipt details, get export validation, then sign the refund. For payroll, they upload or select a payrun, preview totals, approve USDT/BOT, and sign one batch disbursement. Recipients receive stablecoin or BOT directly; admins can review all claims in the VAT Admin panel.
+
+**Target users:** **Tourists and VAT operators** in travel retail corridors (e.g. Dubai/UAE), **SMEs and Web3 teams** paying distributed workers, and **finance/HR admins** who need fast, auditable cross-border settlement without traditional banking delays.
+
+---
+
+### Where is your project currently deployed?
+
+| Item | Link / value |
+| --- | --- |
+| **Network** | BOT Chain **Mainnet** (EVM, chain ID **677**) |
+| **Live product** | https://gemetra-botchain-ten.vercel.app |
+| **GemetraCore contract** | `0xf924220b12dbedb039245c0b960b7dbb37bf1eb2` |
+| **Contract explorer** | https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2 |
+| **Deploy transaction** | `0xb565ca7f27e8a8055f4bfe19ebb05da711d62072f6200f46657bdff326a64443` |
+| **Deploy tx explorer** | https://scan.botchain.ai/tx/0xb565ca7f27e8a8055f4bfe19ebb05da711d62072f6200f46657bdff326a64443 |
+| **USDT (ERC-20)** | `0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c` |
+
+---
+
+### Why did you choose BOT Chain?
+
+Gemetra settles **real-world money flows**—tourist VAT reclaim and cross-border payroll—so we needed a chain built for **low-cost, fast, wallet-native remittance**, not generic DeFi.
+
+**BOT Chain fits Gemetra because:**
+
+1. **EVM + remittance economics** — Familiar Solidity/viem/wagmi stack, with fees and finality suited to many small payouts (refunds and wage batches).
+2. **Stable settlement rails** — Bridged **USDT** plus native **BOT** for stablecoin or native payouts from one UX, with custody-free `GemetraCore`.
+3. **RWA alignment** — VAT claims and wage obligations map to real-world assets; BOT Chain’s RWA direction matches our `recordVatRefund` + BOTScan audit model.
+4. **Complete ecosystem** — BOTScan, bridge, DEX, and BO Wallet reduce friction for demos, operators, and tx verification.
+5. **Migration, not a reskin** — New `GemetraCore` on mainnet (677), full AppKit wallet support, and a live product loop—not just an RPC swap.
+
+---
+
+### What is new or different in the BOT Chain version?
+
+The BOT Chain build is a **full settlement migration**, not a network toggle.
+
+**New on-chain capabilities**
+
+- **`GemetraCore`** on mainnet — custody-free **`disburse`** (USDT + BOT) and immutable VAT registry via **`recordVatRefund`**
+- **`logAgentAction`** for auditable ops/automation decisions
+- Verified deployment on [BOTScan](https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2)
+
+**New integrations**
+
+- **Reown AppKit** (MetaMask, BO Wallet, WalletConnect) on **eip155:677**
+- **Bridged USDT** and **native BOT** in payroll, VAT, and scheduled flows
+- **BOTScan** explorer links on every settlement
+- **Supabase** for claims, payruns, and tx hash audit mirror
+
+**Product improvements**
+
+- End-to-end web app: landing → wallet → VAT claim or wage batch → on-chain proof
+- **VAT Admin** for claim review, export, and cache/DB management
+- **Scheduled wage runs** and **bulk payroll** via `GemetraCore.disburse`
+- Legacy chain-specific flows removed; settlement aligned to BOT Chain EVM mainnet
+
+---
+
+### How will you grow users and on-chain activity after the Challenge?
+
+Growth focuses on **repeatable RWA settlement volume**—VAT reclaim claims and wage disbursements—so every new user drives recurring on-chain txs.
+
+**Phase 1 — VAT tourism corridor**  
+Target UAE/Dubai and high-traffic travel retail. Partner with VAT operators and retailers so tourists claim via wallet before departure. Each claim → `recordVatRefund` + USDT/BOT payout.
+
+**Phase 2 — SME & Web3 payroll**  
+Onboard remote startups, DAOs, and SMEs in India, Africa, LATAM, and Asia. CSV → preview → wallet-signed **`disburse`** for recurring wage runs.
+
+**Phase 3 — Enterprise & corridor expansion**  
+API + white-label for fintechs/HR SaaS; expand VAT geographies (EU, UK, Singapore, KSA).
+
+**Phase 4 — Network effects**  
+Operator/employer loyalty and treasury-backed fulfillment once mainnet volume is established.
+
+**Metrics on BOT Chain:** `disburse` batch count, USDT/BOT settled, `recordVatRefund` claims, unique wallets, recurring monthly payruns.
+
+**Post-challenge:** Stay on **BOT Chain mainnet** and prioritize corridors with **weekly on-chain settlement**.
+
+---
+
+### BOT Chain Mainnet contract & deployment
+
+| Field | Value |
+| --- | --- |
+| **Contract name** | GemetraCore |
+| **Contract address** | `0xf924220b12dbedb039245c0b960b7dbb37bf1eb2` |
+| **Explorer link** | https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2 |
+| **Mainnet deployment tx hash** | `0xb565ca7f27e8a8055f4bfe19ebb05da711d62072f6200f46657bdff326a64443` |
+| **Deploy tx explorer** | https://scan.botchain.ai/tx/0xb565ca7f27e8a8055f4bfe19ebb05da711d62072f6200f46657bdff326a64443 |
+| **Network** | BOT Chain Mainnet · chain ID **677** |
 
 ---
 
