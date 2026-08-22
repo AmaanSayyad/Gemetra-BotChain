@@ -519,7 +519,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                   <h4 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Help & Resources</h4>
                   <div className="space-y-1 sm:space-y-2">
                     <a
-                      href="https://youtu.be/U1QJ2HDRRQE"
+                      href="https://youtu.be/j9PxVo5DRxE"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex items-center space-x-2 px-2 py-2 sm:px-3 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"

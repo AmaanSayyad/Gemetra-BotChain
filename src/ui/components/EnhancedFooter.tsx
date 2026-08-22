@@ -145,7 +145,7 @@ const EnhancedFooter = React.forwardRef<HTMLElement, EnhancedFooterProps>(
                   Resources
                 </h4>
                 <div className="flex flex-col gap-2">
-                  <a href="https://youtu.be/U1QJ2HDRRQE" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
+                  <a href="https://youtu.be/j9PxVo5DRxE" target="_blank" rel="noopener noreferrer" className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm flex items-center gap-1">
                     <Play size={14} />
                     <span>Demo Video</span>
                     <ExternalLink size={12} />

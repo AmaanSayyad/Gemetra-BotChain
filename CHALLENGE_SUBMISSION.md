@@ -4,7 +4,7 @@
 **Track:** **RWA Applications** (Real World Assets)  
 **Live demo:** https://gemetra-botchain-ten.vercel.app  
 **Repository:** https://github.com/AmaanSayyad/Gemetra-BotChain  
-**Demo video:** https://youtu.be/U1QJ2HDRRQE  
+**Demo video:** https://youtu.be/j9PxVo5DRxE  
 **Pitch deck:** https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing  
 
 Gemetra is submitted as an **RWA remittance application**: it digitizes and settles **real-world VAT reclaim claims** and **wage distribution obligations** on BOT Chain Mainnet.
@@ -20,7 +20,7 @@ Gemetra is submitted as an **RWA remittance application**: it digitizes and sett
 | Wallet interaction | Yes | Done | Reown AppKit on `eip155:677` |
 | Public website / online demo | Yes | Done | https://gemetra-botchain-ten.vercel.app |
 | GitHub repository | Yes | Done | https://github.com/AmaanSayyad/Gemetra-BotChain |
-| Demo video | Recommended | Done | https://youtu.be/U1QJ2HDRRQE |
+| Demo video | Recommended | Done | https://youtu.be/j9PxVo5DRxE |
 | Pitch deck | Recommended | Done | [Gemetra — BotChain](https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing) |
 | Project originality | Yes | Done | Original Gemetra product; **migrated** settlement to BOT Chain with new core + frontend |
 

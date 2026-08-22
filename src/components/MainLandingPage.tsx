@@ -84,7 +84,7 @@ function GemetraLandingPage() {
           <Button
             size="large"
             variant="neutral-secondary"
-            onClick={() => window.open('https://youtu.be/U1QJ2HDRRQE', '_blank')}
+            onClick={() => window.open('https://youtu.be/j9PxVo5DRxE', '_blank')}
             icon={<Play size={20} />}
             className="px-8 py-6 hover:bg-brand-50 transition-all duration-300"
           >
@@ -1167,7 +1167,7 @@ function GemetraLandingPage() {
             <Button
               size="large"
               variant="primary"
-              onClick={() => window.open('https://youtu.be/U1QJ2HDRRQE', '_blank')}
+              onClick={() => window.open('https://youtu.be/j9PxVo5DRxE', '_blank')}
               icon={<Play size={20} />}
               className="px-10 py-6 bg-brand-600 hover:bg-brand-700 text-white transition-all duration-300 text-lg"
             >
