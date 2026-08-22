@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, CheckCircle, Clock, AlertCircle, Search, Download, ExternalLink, FileText, User, Calendar, DollarSign } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Payment } from '../lib/supabase';
-import { getVatRefundPaymentsFromBrowserLocalStorage, clearVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserStoredPayments';
+import { getVatRefundPaymentsFromBrowserLocalStorage, clearVatRefundPaymentsFromBrowserLocalStorage, isBotChainVatToken, isLegacyVatToken } from '../utils/browserStoredPayments';
 import { TOKEN_LOGOS, tokenLogoSrc } from '../constants/tokenLogos';
 import { explorerTxUrl } from '../config/botchain';
 
@@ -112,7 +112,23 @@ export const VATAdminPage: React.FC = () => {
           });
         } else {
           console.log(`✅ Found ${data?.length || 0} VAT refund records in Supabase`);
-          remoteRows = (data || []).map(paymentToVatRefundAdmin);
+          remoteRows = (data || [])
+            .map(paymentToVatRefundAdmin)
+            .filter((r) => isBotChainVatToken(r.token));
+
+          // Best-effort remote cleanup of pre-BOT Chain rows
+          const legacyRemote = (data || []).filter((p) => isLegacyVatToken(p.token));
+          if (legacyRemote.length > 0) {
+            void supabase
+              .from('payments')
+              .delete()
+              .eq('employee_id', 'vat-refund')
+              .in(
+                'token',
+                [...new Set(legacyRemote.map((p) => p.token).filter(Boolean))],
+              );
+          }
+
           const localOnlyIds = localRows
             .map((r) => r.id)
             .filter((id) => !remoteRows.some((r) => r.id === id));

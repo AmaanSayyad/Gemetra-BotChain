@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Receipt, ArrowRight, Clock, CheckCircle, ExternalLink } from 'lucide-react';
 import { usePayments } from '../hooks/usePayments';
 import { explorerTxUrl } from '../config/botchain';
+import { isBotChainVatToken } from '../utils/browserStoredPayments';
 
 interface VATRefundOverviewProps {
   setActiveTab: (tab: string) => void;
@@ -46,7 +47,10 @@ export const VATRefundOverview: React.FC<VATRefundOverviewProps> = ({ setActiveT
         const allPayments = await getAllPayments();
         
         // Filter VAT refund payments
-        const vatRefunds = allPayments.filter(payment => payment.employee_id === 'vat-refund');
+        const vatRefunds = allPayments.filter(
+          (payment) =>
+            payment.employee_id === 'vat-refund' && isBotChainVatToken(payment.token),
+        );
         
         if (vatRefunds.length === 0) {
           setIsLoading(false);

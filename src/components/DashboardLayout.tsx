@@ -21,7 +21,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import type { Employee } from '../lib/supabase';
 import { useAccount } from 'wagmi';
 import { usePhantomPublicKey } from '../hooks/usePhantomPublicKey';
-import { getConnectedAccount } from '../utils/ethereum';
+import { purgeLegacyVatRefundPaymentsFromBrowserLocalStorage } from '../utils/browserStoredPayments';
 
 interface DashboardLayoutProps {
   companyName: string;
@@ -36,6 +36,13 @@ const DashboardLayoutContent: React.FC<DashboardLayoutProps> = ({ companyName: i
     address && isConnected ? address : phantomPublicKey || '';
 
   const [companyName, setCompanyName] = useState(initialCompanyName || 'My Company');
+
+  useEffect(() => {
+    const removed = purgeLegacyVatRefundPaymentsFromBrowserLocalStorage();
+    if (removed > 0) {
+      console.log(`Removed ${removed} legacy SOL/PUSD VAT refund row(s) from browser cache`);
+    }
+  }, []);
 
   useEffect(() => {
     if (!sessionWalletKey) return;

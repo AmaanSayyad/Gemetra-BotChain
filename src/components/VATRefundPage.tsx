@@ -6,7 +6,7 @@ import { buildPaymentQrUrl } from '../utils/solanaPayTransferUrl';
 import { explorerTxUrl } from '../config/botchain';
 import { usePayments } from '../hooks/usePayments';
 import { usePoints } from '../hooks/usePoints';
-import { supabase } from '../lib/supabase';
+import { isBotChainVatToken } from '../utils/browserStoredPayments';
 
 
 interface VATRefundPageProps {
@@ -15,7 +15,7 @@ interface VATRefundPageProps {
 
 function vatHistoryTokenLogo(token?: string): { src: string; alt: string } {
   const upper = (token || 'USDT').toUpperCase();
-  if (upper === 'BOT' || upper === 'SOL') {
+  if (upper === 'BOT') {
     return { src: '/botchain.png', alt: 'BOT' };
   }
   return { src: '/usdt.png', alt: 'USDT' };
@@ -64,7 +64,10 @@ export const VATRefundPage: React.FC<VATRefundPageProps> = () => {
 
         // Filter payments that are VAT refunds (employee_id === 'vat-refund')
         const vatRefunds = allPayments
-          .filter(payment => payment.employee_id === 'vat-refund')
+          .filter(
+            (payment) =>
+              payment.employee_id === 'vat-refund' && isBotChainVatToken(payment.token),
+          )
           .map(payment => ({
             id: payment.id,
             date: payment.created_at,
