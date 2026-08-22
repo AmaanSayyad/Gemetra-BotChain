@@ -1,5 +1,11 @@
 # Points System (RWA engagement)
 
+| | |
+| --- | --- |
+| **Live demo** | https://gemetra-botchain-ten.vercel.app |
+| **Demo video** | https://youtu.be/j9PxVo5DRxE |
+| **Docs index** | [README.md](./README.md) |
+
 Points reward **completed real-world settlement flows** in Gemetra—primarily **VAT reclaim** and **wage distribution**—so operators who close RWA loops on BOT Chain earn engagement credit convertible toward **USDT**.
 
 ---

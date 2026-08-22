@@ -1,5 +1,12 @@
 # VAT Refund Document Format Guide
 
+| | |
+| --- | --- |
+| **Live demo** | https://gemetra-botchain-ten.vercel.app |
+| **Demo video** | https://youtu.be/j9PxVo5DRxE |
+| **Sample data** | [VAT_REFUND_SAMPLE_DATA.md](./VAT_REFUND_SAMPLE_DATA.md) |
+| **GemetraCore** | https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2 |
+
 > **RWA focus:** tourist **VAT reclaim claims** are real-world tax assets. Gemetra settles them on **BOT Chain Mainnet** (chain ID **677**) in **USDT** or native **BOT**.  
 > Receiver wallets must be **EVM addresses**. On-chain: `GemetraCore.recordVatRefund` + settlement.
 

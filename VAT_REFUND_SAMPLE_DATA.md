@@ -1,5 +1,12 @@
 # VAT Refund Form — Sample Data (BOT Chain)
 
+| | |
+| --- | --- |
+| **Live demo** | https://gemetra-botchain-ten.vercel.app |
+| **Demo video** | https://youtu.be/j9PxVo5DRxE |
+| **Format guide** | [VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md](./VAT_REFUND_DOCUMENT_FORMAT_GUIDE.md) |
+| **GemetraCore** | https://scan.botchain.ai/address/0xf924220b12dbedb039245c0b960b7dbb37bf1eb2 |
+
 **RWA sample payloads** for tourist **VAT reclaim claims** on **BOT Chain Mainnet**. Receiver addresses are **EVM (`0x…`)** wallets. Payouts settle in **USDT** (default) or native **BOT**.
 
 ```mermaid

@@ -23,6 +23,7 @@ Gemetra is submitted as an **RWA remittance application**: it digitizes and sett
 | Demo video | Recommended | Done | https://youtu.be/j9PxVo5DRxE |
 | Pitch deck | Recommended | Done | [Gemetra — BotChain](https://docs.google.com/presentation/d/1QxKpMPxLiS-bpKkow8S5PApxNrgUUppg64oxbx-tU28/edit?usp=sharing) |
 | Project originality | Yes | Done | Original Gemetra product; **migrated** settlement to BOT Chain with new core + frontend |
+| Testnet (dev) | Optional | Done | [Deploy tx](https://scan.bohr.life/tx/0x2659121de64c8e4b59e7a6b52a5c019ec4d333737d48bd979b569082cc1ee21b) on chain **968** · see [README § Deployment](./README.md#deployment) |
 
 ---
 
@@ -65,9 +66,7 @@ sequenceDiagram
 
 ### Why BOT Chain?
 
-- Low-fee, fast-finality EVM rails suited to **remittance of real-world obligations**.  
-- Ecosystem USDT + bridge/DEX/wallet for stable settlement.  
-- Aligns with BOT’s **RWA infrastructure** direction (asset distribution, claim registry, auditability).
+Low-fee, fast-finality EVM rails for **real-world remittance**; **USDT + BOT** settlement; RWA claim registry + BOTScan audit; full AppKit wallet stack on mainnet **677** — a migration with new `GemetraCore`, not an RPC swap. Details: [README § Why BOT Chain?](./README.md#why-bot-chain)
 
 ### What does the BOT Chain version add?
 
@@ -81,9 +80,14 @@ sequenceDiagram
 
 ### How will you grow users & on-chain activity?
 
-1. Tourist **VAT reclaim** corridors (claim registry + refund txs).  
-2. SME **wage distribution** cohorts (recurring `disburse` volume).  
-3. Stay on BOT mainnet for Demo Day, ecosystem listing, and continued claim/payrun throughput.
+1. **VAT corridors** — UAE/Dubai operators & retailers → recurring `recordVatRefund` + USDT/BOT payouts  
+2. **SME payroll** — remote startups, DAOs, SMEs → recurring `disburse` wage batches  
+3. **Enterprise APIs** — fintech / HR SaaS white-label; expand VAT geographies (EU, UK, SG, KSA)  
+4. **Network effects** — operator loyalty once mainnet volume is established  
+
+**Metrics:** `disburse` volume, `recordVatRefund` count, unique wallets, monthly recurring payruns.
+
+Full form answers: [README § Challenge submission Q&A](./README.md#challenge-submission-qa)
 
 ---
 
@@ -105,7 +109,7 @@ sequenceDiagram
 2. Connect wallet → **BOT Chain (677)**  
 3. Fund small **BOT** (gas) + **USDT**  
 4. Run a **VAT claim** and/or **wage bulk disburse** → confirm on [BOTScan](https://scan.botchain.ai)  
-5. Skim RWA sequences in [README.md](./README.md)  
+5. Watch the [demo video](https://youtu.be/j9PxVo5DRxE) and skim architecture in [README.md](./README.md)  
 
 ---
 
