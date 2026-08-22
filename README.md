@@ -59,37 +59,131 @@ Artifact: [`deployments/botchain-testnet.json`](./deployments/botchain-testnet.j
 
 ```mermaid
 flowchart TB
-  subgraph RW["Real-world obligations"]
-    VAT["VAT reclaim"]
-    PAY["Wage payruns"]
+  subgraph RealWorld["Real-world assets & obligations"]
+    VATRW["VAT reclaim claims<br/>tourist tax"]
+    WAGERW["Wage obligations<br/>payroll / schedules"]
   end
-  APP["Gemetra web app"]
-  W["Reown AppKit wallets"]
-  SB["Supabase"]
-  CORE["GemetraCore · 677"]
-  SCAN["BOTScan"]
 
-  VAT --> APP
-  PAY --> APP
-  APP --> W
-  APP --> SB
+  subgraph Client
+    WEB["React + Vite app"]
+    W["EVM wallets<br/>Reown AppKit"]
+  end
+
+  subgraph App
+    UI["VAT · Payroll · Admin · Ops"]
+    ETH["ethereum.ts / wagmi / viem"]
+  end
+
+  subgraph Data
+    SB["Supabase<br/>claims · payments · employees"]
+  end
+
+  subgraph BOT["BOT Chain Mainnet · 677"]
+    CORE["GemetraCore<br/>registry + disburse"]
+    USDT["USDT ERC-20"]
+    SCAN["BOTScan"]
+  end
+
+  VATRW --> UI
+  WAGERW --> UI
+  WEB --> UI
+  UI --> ETH
+  UI --> SB
+  ETH --> W
   W --> CORE
+  W --> USDT
   CORE --> SCAN
+  USDT --> SCAN
 ```
+
+### End-to-end RWA product loop
+
+```mermaid
+sequenceDiagram
+  actor Op as Operator / Employer
+  participant UI as Gemetra Web
+  participant W as Wallet (AppKit)
+  participant C as GemetraCore
+  participant T as USDT
+  participant S as Supabase
+  participant X as BOTScan
+
+  Op->>UI: Open demo · connect wallet (eip155:677)
+  W-->>UI: address + chain
+
+  alt VAT refund (tax reclaim RWA)
+    Op->>UI: Claim + receipt metadata
+    UI->>W: Sign payout
+    W->>C: recordVatRefund(claimId, …)
+    W->>C: disburse / transfer USDT|BOT
+    C-->>X: VatRefundRecorded + Disbursed
+    UI->>S: Persist claim + tx hash
+  else Payroll / wage distribution RWA
+    Op->>UI: Employees + amounts + USDT|BOT
+    UI->>W: approve USDT → GemetraCore (if needed)
+    W->>T: approve(core, total)
+    W->>C: disburse(...)
+    C->>T: transferFrom(payer → recipients)
+    C-->>X: Disbursed
+    UI->>S: Store payment rows
+  end
+
+  Op->>X: Verify on BOTScan
+```
+
+### VAT refund (core RWA)
+
+```mermaid
+sequenceDiagram
+  actor Tourist
+  participant Retailer
+  participant Gemetra as Gemetra App
+  participant Oracle as Export oracle (ops)
+  participant Core as GemetraCore
+  participant Wallet as Payer wallet
+
+  Tourist->>Retailer: Purchase (VAT included)
+  Retailer->>Gemetra: Tax-free tag / claim metadata
+  Tourist->>Oracle: Airport export validation
+  Oracle->>Gemetra: Validated claim (receipt ref)
+  Gemetra->>Wallet: Request USDT/BOT payout signature
+  Wallet->>Core: recordVatRefund + disburse/transfer
+  Core-->>Tourist: On-chain refund + claim registry
+```
+
+### Wage distribution (RWA)
+
+```mermaid
+sequenceDiagram
+  actor HR as HR / CFO
+  participant UI as Gemetra
+  participant W as Wallet
+  participant C as GemetraCore
+
+  HR->>UI: Upload / select payrun (real wage obligations)
+  HR->>UI: Preview totals · USDT or BOT
+  UI->>W: User confirms & signs
+  W->>C: disburse(payroll)
+  C-->>UI: tx hash · BOTScan link
+```
+
+### Scheduled wage runs
 
 ```mermaid
 sequenceDiagram
   actor User
-  participant App as Gemetra
+  participant UI as Gemetra
+  participant LS as localStorage / Supabase
   participant W as Wallet
   participant C as GemetraCore
-  participant X as BOTScan
 
-  User->>App: VAT claim or payroll payrun
-  App->>W: Connect · sign on chain 677
-  W->>C: recordVatRefund / disburse
-  C-->>X: On-chain events
-  App-->>User: Tx hash · history
+  User->>UI: Schedule USDT|BOT wage run
+  UI->>LS: Persist schedule + pre-approval limits
+  loop When due
+    UI->>W: Sign disburse / transfer
+    W->>C: Settle on BOT Chain
+    UI->>LS: Mark processed · next date
+  end
 ```
 
 ---
